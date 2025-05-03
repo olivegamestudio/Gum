@@ -241,10 +241,13 @@ public class Cursor : ICursor
         int? x = null;
         int? y = null;
 
-        var supportsMouse =
-            !System.OperatingSystem.IsAndroid() && !System.OperatingSystem.IsIOS();
+        var supportsMouse = true;
 
-        if(supportsMouse)
+#if NET6_0_OR_GREATER
+        supportsMouse = !System.OperatingSystem.IsAndroid() && !System.OperatingSystem.IsIOS();
+#endif
+
+        if (supportsMouse)
         {
             LastInputDevice = InputDevice.Mouse;
 

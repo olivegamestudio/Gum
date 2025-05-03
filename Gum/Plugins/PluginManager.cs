@@ -731,8 +731,10 @@ namespace Gum.Plugins
 
             #region Start all plugins
 
+
             foreach (PluginBase plugin in instance.Plugins)
             {
+                var timeBefore = DateTime.Now;
 
                 // We used to do this all in an assign references method,
                 // but we now do it here so that the Startup function can have
@@ -745,6 +747,10 @@ namespace Gum.Plugins
                 plugin.MenuStrip = mainWindow.MainMenuStrip;
 
                 StartupPlugin(plugin, instance);
+
+                var timeAfter = DateTime.Now;
+
+                System.Diagnostics.Debug.WriteLine($"{timeAfter - timeBefore} starting {plugin}");
             }
 
             #endregion

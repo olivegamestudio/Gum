@@ -249,7 +249,14 @@ namespace RenderingLibrary
 #if KNI
                 string prefix = "KniGum";
 #elif FNA
+
+
+#if NET6_0_OR_GREATER
                 string prefix = "FnaGum";
+#else
+                string prefix = "FnaGumNetFramework";
+#endif
+
 #else
                 string prefix = "MonoGameGum.Content";
 #endif

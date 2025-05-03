@@ -4646,7 +4646,7 @@ public partial class GraphicalUiElement : IRenderableIpso, IVisible, INotifyProp
     /// this does not perform any operations - it can be safely called multiple times.
     /// </summary>
 
-#if NET6_0_OR_GREATER
+#if NET6_0_OR_GREATER || FNA
     public virtual void AddToManagers()
     {
 

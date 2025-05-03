@@ -147,7 +147,7 @@ public class GumService
         Root.Name = "Main Root";
         Root.HasEvents = false;
 
-        Root.AddToManagers();
+        Root.AddToManagers(SystemManagers.Default);
 
         GumProjectSave? gumProject = null;
 
