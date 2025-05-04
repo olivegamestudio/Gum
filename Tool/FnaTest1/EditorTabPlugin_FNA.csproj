@@ -4,7 +4,8 @@
 		<OutputType>Library</OutputType>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<LangVersion>12.0</LangVersion>
-
+		<UseWindowsForms>true</UseWindowsForms>
+		<UseWPF>true</UseWPF>
 	</PropertyGroup>
 	<ItemGroup>
 		<None Remove="FNA.dll" />
@@ -42,6 +43,6 @@
 		<Reference Include="WindowsBase" />
 	</ItemGroup>
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-	  <Exec Command="  echo Copying to &quot;$(SolutionDir)Gum\bin\$(ConfigurationName)\Plugins\$(TargetName)\&quot;&#xD;&#xA;  IF NOT EXIST &quot;$(SolutionDir)Gum\bin\$(ConfigurationName)\Plugins\$(TargetName)&quot; md &quot;$(SolutionDir)Gum\bin\$(ConfigurationName)\Plugins\$(TargetName)\&quot;&#xD;&#xA;  echo Target path $(TargetPath) targetName $(TargetName)&#xD;&#xA;  copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)Gum\bin\$(ConfigurationName)\Plugins\$(TargetName)&quot;&#xD;&#xA;  copy &quot;$(TargetDir)$(TargetName).pdb&quot; &quot;$(SolutionDir)Gum\bin\$(ConfigurationName)\Plugins\$(TargetName)&quot;&#xD;&#xA;copy &quot;$(TargetDir)FNA.dll&quot; &quot;$(SolutionDir)Gum\bin\$(ConfigurationName)\Plugins\$(TargetName)&quot;&#xD;&#xA;copy &quot;$(TargetDir)fna3d.dll&quot; &quot;$(SolutionDir)Gum\bin\$(ConfigurationName)\Plugins\$(TargetName)&quot;&#xD;&#xA;copy &quot;$(TargetDir)SDL3.dll&quot; &quot;$(SolutionDir)Gum\bin\$(ConfigurationName)\Plugins\$(TargetName)&quot;&#xD;&#xA;copy &quot;$(TargetDir)FnaGumNetFramework.dll&quot; &quot;$(SolutionDir)Gum\bin\$(ConfigurationName)\Plugins\$(TargetName)&quot;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;" />
+	  <Exec Command="  echo Copying to &quot;$(SolutionDir)Gum\bin\$(ConfigurationName)\Plugins\$(TargetName)\&quot;&#xD;&#xA;  IF NOT EXIST &quot;$(SolutionDir)Gum\bin\$(ConfigurationName)\Plugins\$(TargetName)&quot; md &quot;$(SolutionDir)Gum\bin\$(ConfigurationName)\Plugins\$(TargetName)\&quot;&#xD;&#xA;  echo Target path $(TargetPath) targetName $(TargetName)&#xD;&#xA;  copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)Gum\bin\$(ConfigurationName)\Plugins\$(TargetName)&quot;&#xD;&#xA;  copy &quot;$(TargetDir)$(TargetName).pdb&quot; &quot;$(SolutionDir)Gum\bin\$(ConfigurationName)\Plugins\$(TargetName)&quot;&#xD;&#xA;copy &quot;$(TargetDir)FNA.dll&quot; &quot;$(SolutionDir)Gum\bin\$(ConfigurationName)\Plugins\$(TargetName)&quot;&#xD;&#xA;copy &quot;$(TargetDir)fna3d.dll&quot; &quot;$(SolutionDir)Gum\bin\$(ConfigurationName)\Plugins\$(TargetName)&quot;&#xD;&#xA;copy &quot;$(TargetDir)SDL3.dll&quot; &quot;$(SolutionDir)Gum\bin\$(ConfigurationName)\Plugins\$(TargetName)&quot;&#xD;&#xA;copy &quot;$(TargetDir)FnaGumNetFramework.dll&quot; &quot;$(SolutionDir)Gum\bin\$(ConfigurationName)\Plugins\$(TargetName)&quot;&#xD;&#xA;copy &quot;$(TargetDir)FnaGumNetFramework.pdb&quot; &quot;$(SolutionDir)Gum\bin\$(ConfigurationName)\Plugins\$(TargetName)&quot;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;" />
 	</Target>
 </Project>
