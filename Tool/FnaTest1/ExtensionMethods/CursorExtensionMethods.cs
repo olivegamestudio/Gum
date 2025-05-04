@@ -2,6 +2,7 @@
 using Vector2 = System.Numerics.Vector2;
 using Vector3 = System.Numerics.Vector3;
 using Matrix = System.Numerics.Matrix4x4;
+using MonoGameGum.Input;
 
 namespace InputLibrary
 {

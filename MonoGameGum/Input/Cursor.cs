@@ -215,6 +215,15 @@ public class Cursor : ICursor
     double mLastSecondaryClickTime = -999;
     double mLastMiddleClickTime = -999;
 
+    public bool IsInWindow
+    {
+        get
+        {
+            return X >= 0 && X <  GumService.Default.CanvasWidth &&
+                Y >= 0 && Y < GumService.Default.CanvasHeight;
+        }
+    }
+
     public void ClearInputValues()
     {
         _lastFrameTouchCollection = new TouchCollection();

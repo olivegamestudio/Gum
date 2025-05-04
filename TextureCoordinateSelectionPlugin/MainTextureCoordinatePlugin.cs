@@ -21,7 +21,7 @@ using System.Windows.Forms;
 
 namespace TextureCoordinateSelectionPlugin;
 
-[Export(typeof(PluginBase))]
+//[Export(typeof(PluginBase))]
 public class MainTextureCoordinatePlugin : PluginBase
 {
     #region Fields/Properties

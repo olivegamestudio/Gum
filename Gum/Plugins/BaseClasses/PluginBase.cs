@@ -193,7 +193,7 @@ namespace Gum.Plugins.BaseClasses
 
         public event Func<bool>? TryHandleDelete;
 
-        public event Func<InputLibrary.Cursor, Vector2?>? GetWorldCursorPosition;
+        //public event Func<InputLibrary.Cursor, Vector2?>? GetWorldCursorPosition;
 
         #endregion
 
@@ -525,8 +525,8 @@ namespace Gum.Plugins.BaseClasses
         public GraphicalUiElement? CallCreateGraphicalUiElement(ElementSave elementSave) =>
             CreateGraphicalUiElement?.Invoke(elementSave);
 
-        public Vector2? CallGetWorldCursorPosition(InputLibrary.Cursor cursor) =>
-            GetWorldCursorPosition?.Invoke(cursor);
+        //public Vector2? CallGetWorldCursorPosition(InputLibrary.Cursor cursor) =>
+        //    GetWorldCursorPosition?.Invoke(cursor);
 
         public IEnumerable<IPositionedSizedObject>? CallGetSelectedIpsos() =>
             GetSelectedIpsos?.Invoke();

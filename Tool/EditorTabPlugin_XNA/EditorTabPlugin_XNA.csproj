@@ -47,6 +47,7 @@
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
 		<PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
 		<ProjectReference Include="..\..\Gum\Gum.csproj" />
+		<ProjectReference Include="..\..\InputLibrary\InputLibrary.csproj" />
 		<ProjectReference Include="..\..\RenderingLibrary\RenderingLibrary.csproj" />
 		<ProjectReference Include="..\..\XnaAndWinforms\XnaAndWinforms.csproj" />
 

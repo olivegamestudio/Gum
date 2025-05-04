@@ -43,10 +43,6 @@ public class ExampleGame : Game
         Gum.Initialize(this);
         FileManager.RelativeDirectory = relativeDirectory;
 
-        var rectangle = new ColoredRectangleRuntime();
-        rectangle.AddToRoot();
-
-
         base.Initialize();
     }
 
@@ -60,6 +56,11 @@ public class ExampleGame : Game
     protected override void Update(GameTime gameTime)
     {
         Gum.Update(gameTime);
+
+        // todo - pull in DragDropManager.
+        // Look at DragDropManager.Activity "todo - move this"
+
+
 
         try
         {

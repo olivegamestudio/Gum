@@ -18,6 +18,8 @@ using System.Windows.Input;
 using System;
 using Gum.ToolCommands;
 using InputLibrary;
+using MonoGameGum;
+using EditorTabPlugin_XNA.ExtensionMethods;
 
 namespace Gum.Wireframe.Editors
 {
@@ -46,11 +48,11 @@ namespace Gum.Wireframe.Editors
         private readonly ElementCommands _elementCommands;
         private readonly SelectionManager _selectionManager;
 
-        public InputLibrary.Cursor Cursor
+        public MonoGameGum.Input.Cursor Cursor
         {
             get
             {
-                return InputLibrary.Cursor.Self;
+                return GumService.Default.Cursor;
             }
         }
 
@@ -247,15 +249,15 @@ namespace Gum.Wireframe.Editors
                 var originX = gue.AbsoluteX;
                 var originY = gue.AbsoluteY;
 
-                var cursorX = InputLibrary.Cursor.Self.GetWorldX(SystemManagers.Default);
-                var cursorY = InputLibrary.Cursor.Self.GetWorldY(SystemManagers.Default);
+                var cursorX = GumService.Default.Cursor.GetWorldX(SystemManagers.Default);
+                var cursorY = GumService.Default.Cursor.GetWorldY(SystemManagers.Default);
 
                 var angleInRadians = (float)System.Math.Atan2(cursorY - originY, cursorX - originX);
 
                 var rotationValueDegrees =
                     -MathHelper.ToDegrees(angleInRadians);
 
-                if(_hotkeyManager.SnapRotationTo15Degrees.IsPressed(InputLibrary.Keyboard.Self))
+                if(_hotkeyManager.SnapRotationTo15Degrees.IsPressed(GumService.Default.Keyboard))
                 {
                     rotationValueDegrees = MathFunctions.RoundFloat(rotationValueDegrees, 15);
                 }
@@ -289,7 +291,7 @@ namespace Gum.Wireframe.Editors
 
         private void RefreshRotationGrabbed()
         {
-            var cursor = InputLibrary.Cursor.Self;
+            var cursor = GumService.Default.Cursor;
             var worldX = cursor.GetWorldX(SystemManagers.Default);
             var worldY = cursor.GetWorldY(SystemManagers.Default);
 
@@ -351,7 +353,7 @@ namespace Gum.Wireframe.Editors
 
         private void ClickActivity()
         {
-            var cursor = InputLibrary.Cursor.Self;
+            var cursor = GumService.Default.Cursor;
 
             if (cursor.PrimaryDown == false)
             {
@@ -366,7 +368,7 @@ namespace Gum.Wireframe.Editors
             if (cursor.PrimaryClick && mHasChangedAnythingSinceLastPush)
             {
                 // If the user resized with locked to axis, then released, we don't want to apply this, because they are not doing axis constrained movement
-                if (_hotkeyManager.LockMovementToAxis.IsPressed(InputLibrary.Keyboard.Self) && SideGrabbed == ResizeSide.None)
+                if (_hotkeyManager.LockMovementToAxis.IsPressed(GumService.Default.Keyboard) && SideGrabbed == ResizeSide.None)
                 {
                     ApplyAxisLockToSelectedState();
 
@@ -390,7 +392,7 @@ namespace Gum.Wireframe.Editors
 
         private void HandlesActivity()
         {
-            var cursor = InputLibrary.Cursor.Self;
+            var cursor = GumService.Default.Cursor;
 
             if (cursor.PrimaryPush)
             {
@@ -408,8 +410,8 @@ namespace Gum.Wireframe.Editors
 
         private void SideGrabbingActivity()
         {
-            float cursorXChange = InputLibrary.Cursor.Self.XChange / Renderer.Self.Camera.Zoom;
-            float cursorYChange = InputLibrary.Cursor.Self.YChange / Renderer.Self.Camera.Zoom;
+            float cursorXChange = GumService.Default.Cursor.XChange / Renderer.Self.Camera.Zoom;
+            float cursorYChange = GumService.Default.Cursor.YChange / Renderer.Self.Camera.Zoom;
 
             ////////////////////////////////EARLY OUT//////////////////////////////////////
             if (cursorXChange == 0 && cursorYChange == 0)
@@ -477,7 +479,7 @@ namespace Gum.Wireframe.Editors
         {
             // The selected object is set in the SelectionManager
 
-            var cursor = InputLibrary.Cursor.Self;
+            var cursor = GumService.Default.Cursor;
             if (cursor.PrimaryPush)
             {
                 // do this first to get the rotation handles to update to the right size/position to prevent accidental clicks
@@ -610,7 +612,7 @@ namespace Gum.Wireframe.Editors
 
         private void BodyGrabbingActivity()
         {
-            var cursor = InputLibrary.Cursor.Self;
+            var cursor = GumService.Default.Cursor;
             if (_selectionManager.IsOverBody && cursor.PrimaryDown && mHasGrabbed &&
                 grabbedState.HasMovedEnough)
             {
@@ -731,36 +733,36 @@ namespace Gum.Wireframe.Editors
             }
         }
 
-        //public override System.Windows.Forms.Cursor GetWindowsCursorToShow(
-        //    System.Windows.Forms.Cursor defaultCursor, float worldXAt, float worldYAt)
-        //{
-        //    System.Windows.Forms.Cursor cursorToSet = defaultCursor;
+        public override System.Windows.Forms.Cursor GetWindowsCursorToShow(
+            System.Windows.Forms.Cursor defaultCursor, float worldXAt, float worldYAt)
+        {
+            System.Windows.Forms.Cursor cursorToSet = defaultCursor;
 
 
-        //    switch (SideOver)
-        //    {
-        //        case ResizeSide.TopLeft:
-        //        case ResizeSide.BottomRight:
-        //            cursorToSet = System.Windows.Forms.Cursors.SizeNWSE;
-        //            break;
-        //        case ResizeSide.TopRight:
-        //        case ResizeSide.BottomLeft:
-        //            cursorToSet = System.Windows.Forms.Cursors.SizeNESW;
-        //            break;
-        //        case ResizeSide.Top:
-        //        case ResizeSide.Bottom:
-        //            cursorToSet = System.Windows.Forms.Cursors.SizeNS;
-        //            break;
-        //        case ResizeSide.Left:
-        //        case ResizeSide.Right:
-        //            cursorToSet = System.Windows.Forms.Cursors.SizeWE;
-        //            break;
-        //        case ResizeSide.None:
+            switch (SideOver)
+            {
+                case ResizeSide.TopLeft:
+                case ResizeSide.BottomRight:
+                    cursorToSet = System.Windows.Forms.Cursors.SizeNWSE;
+                    break;
+                case ResizeSide.TopRight:
+                case ResizeSide.BottomLeft:
+                    cursorToSet = System.Windows.Forms.Cursors.SizeNESW;
+                    break;
+                case ResizeSide.Top:
+                case ResizeSide.Bottom:
+                    cursorToSet = System.Windows.Forms.Cursors.SizeNS;
+                    break;
+                case ResizeSide.Left:
+                case ResizeSide.Right:
+                    cursorToSet = System.Windows.Forms.Cursors.SizeWE;
+                    break;
+                case ResizeSide.None:
 
-        //            break;
-        //    }
-        //    return cursorToSet;
-        //}
+                    break;
+            }
+            return cursorToSet;
+        }
 
         private void RefreshSideOver()
         {
@@ -851,7 +853,7 @@ namespace Gum.Wireframe.Editors
                 heightMultiplier *= (((IPositionedSizedObject)ipso).Height / mResizeHandles.Height);
             }
 
-            if (_hotkeyManager.ResizeFromCenter.IsPressed(InputLibrary.Keyboard.Self))
+            if (_hotkeyManager.ResizeFromCenter.IsPressed(GumService.Default.Keyboard))
             {
                 if (widthMultiplier != 0)
                 {
@@ -1056,7 +1058,7 @@ namespace Gum.Wireframe.Editors
 
         private void AdjustCursorChangeValuesForAxisLockedDrag(ref float cursorXChange, ref float cursorYChange, InstanceSave instanceSave, List<ElementWithState> elementStack)
         {
-            var isAxisLocked = _hotkeyManager.LockMovementToAxis.IsPressed(InputLibrary.Keyboard.Self);
+            var isAxisLocked = _hotkeyManager.LockMovementToAxis.IsPressed(GumService.Default.Keyboard);
             if (isAxisLocked)
             {
                 bool supportsLockedAxis =
@@ -1067,7 +1069,7 @@ namespace Gum.Wireframe.Editors
                 {
                     IRenderableIpso ipso = WireframeObjectManager.Self.GetRepresentation(instanceSave, elementStack);
 
-                    var cursor = InputLibrary.Cursor.Self;
+                    var cursor = GumService.Default.Cursor;
                     float cursorX = cursor.GetWorldX(SystemManagers.Default);
                     float cursorY = cursor.GetWorldY(SystemManagers.Default);
 

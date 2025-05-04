@@ -564,21 +564,21 @@ namespace Gum.Plugins
             return toReturn;
         }
 
-        public System.Numerics.Vector2? GetWorldCursorPosition(InputLibrary.Cursor cursor)
-        {
-            Vector2? toReturn = null;
-            CallMethodOnPlugin(plugin =>
-            {
-                var innerResult = plugin.CallGetWorldCursorPosition(cursor);
+        //public System.Numerics.Vector2? GetWorldCursorPosition(InputLibrary.Cursor cursor)
+        //{
+        //    Vector2? toReturn = null;
+        //    CallMethodOnPlugin(plugin =>
+        //    {
+        //        var innerResult = plugin.CallGetWorldCursorPosition(cursor);
 
-                if(innerResult != null)
-                {
-                    toReturn = innerResult;
-                }
-            });
+        //        if(innerResult != null)
+        //        {
+        //            toReturn = innerResult;
+        //        }
+        //    });
 
-            return toReturn;
-        }
+        //    return toReturn;
+        //}
 
         #endregion
 

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace EditorTabPlugin_XNA.ExtensionMethods;
 public static class KeyCombinationExtensionMethods
 {
-    public static bool IsPressed(this KeyCombination keyCombination, InputLibrary.Keyboard keyboard)
+    public static bool IsPressed(this KeyCombination keyCombination, MonoGameGum.Input.Keyboard keyboard)
     {
         if (keyCombination.IsShiftDown &&
             !keyboard.KeyDown(Microsoft.Xna.Framework.Input.Keys.LeftShift) &&

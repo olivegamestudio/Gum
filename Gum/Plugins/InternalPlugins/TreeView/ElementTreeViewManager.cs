@@ -19,6 +19,7 @@ using Gum.Plugins.InternalPlugins.TreeView.ViewModels;
 using Gum.Logic;
 using System.Drawing;
 using WpfInput = System.Windows.Input;
+//using System.Windows.Controls;
 
 namespace Gum.Managers
 {
@@ -220,7 +221,7 @@ namespace Gum.Managers
         {
             get
             {
-                var mousePosition = Control.MousePosition;
+                var mousePosition = System.Windows.Forms.Control.MousePosition;
                 var clientPoint = ObjectTreeView.PointToClient(mousePosition);
                 return ObjectTreeView.ClientRectangle.Contains(clientPoint);
             }
@@ -563,13 +564,18 @@ namespace Gum.Managers
                 // Use custom cursors if the check box is checked.
                 // Sets the custom cursor based upon the effect.
                 //InputManager.
-                if(InputLibrary.Cursor.Self.IsInWindow)
-                {
-                    e.UseDefaultCursors = false;
-                    System.Windows.Forms.Cursor.Current = GumCommands.Self.GuiCommands.AddCursor;
-                }
+                // Update May 4, 2025 - this no longer
+                // works because we can't use XNA in the main Gum window
+                // Eventually try to fix this
+                //if(InputLibrary.Cursor.Self.IsInWindow)
+                //{
+                //    e.UseDefaultCursors = false;
+                //    System.Windows.Forms.Cursor.Current = GumCommands.Self.GuiCommands.AddCursor;
+                //}
             };
         }
+
+
 
         private ImageList CloneImageList(ImageList original)
         {

@@ -37,10 +37,10 @@ public class DragDropManager
 
     #region Properties
 
-    public InputLibrary.Cursor Cursor
-    {
-        get { return InputLibrary.Cursor.Self; }
-    }
+    //public InputLibrary.Cursor Cursor
+    //{
+    //    get { return InputLibrary.Cursor.Self; }
+    //}
 
     public static DragDropManager Self
     {
@@ -572,22 +572,23 @@ public class DragDropManager
             //}
 
 
-            if (!Cursor.PrimaryDownIgnoringIsInWindow)
-            {
-                List<TreeNode> treeNodesToDrop = GetTreeNodesToDrop();
+            // todo - move this
+            //if (!Cursor.PrimaryDownIgnoringIsInWindow)
+            //{
+            //    List<TreeNode> treeNodesToDrop = GetTreeNodesToDrop();
 
-                foreach (var draggedTreeNode in treeNodesToDrop)
-                {
-                    object draggedObject = draggedTreeNode.Tag;
+            //    foreach (var draggedTreeNode in treeNodesToDrop)
+            //    {
+            //        object draggedObject = draggedTreeNode.Tag;
 
-                    HandleDroppedItemInWireframe(draggedObject, out bool handled);
+            //        HandleDroppedItemInWireframe(draggedObject, out bool handled);
 
-                    if(handled)
-                    {
-                        mDraggedItem = null;
-                    }
-                }
-            }
+            //        if(handled)
+            //        {
+            //            mDraggedItem = null;
+            //        }
+            //    }
+            //}
         }
     }
 
@@ -638,34 +639,34 @@ public class DragDropManager
     {
         handled = false;
 
-        if (Cursor.IsInWindow)
-        {   
-            ElementSave draggedAsElementSave = draggedObject as ElementSave;                    
-            ElementSave target = Wireframe.WireframeObjectManager.Self.ElementShowing;
+        //if (Cursor.IsInWindow)
+        //{   
+        //    ElementSave draggedAsElementSave = draggedObject as ElementSave;                    
+        //    ElementSave target = Wireframe.WireframeObjectManager.Self.ElementShowing;
 
-            // Depending on how fast the user clicks the UI may think they dragged an instance rather than 
-            // an element, so let's protect against that with this null check.
-            if (draggedAsElementSave != null)
-            {
-                var newInstance = HandleDroppedElementInElement(draggedAsElementSave, target, null, out handled);
+        //    // Depending on how fast the user clicks the UI may think they dragged an instance rather than 
+        //    // an element, so let's protect against that with this null check.
+        //    if (draggedAsElementSave != null)
+        //    {
+        //        var newInstance = HandleDroppedElementInElement(draggedAsElementSave, target, null, out handled);
 
-                float worldX, worldY;
+        //        float worldX, worldY;
 
-                var position = PluginManager.Self.GetWorldCursorPosition(Cursor);
+        //        var position = PluginManager.Self.GetWorldCursorPosition(Cursor);
 
-                worldX = position?.X ?? 0;
-                worldY = position?.Y ?? 0;
+        //        worldX = position?.X ?? 0;
+        //        worldY = position?.Y ?? 0;
 
-                if(newInstance != null)
-                {
+        //        if(newInstance != null)
+        //        {
 
-                    SetInstanceToPosition(worldX, worldY, newInstance);
+        //            SetInstanceToPosition(worldX, worldY, newInstance);
 
-                    SaveAndRefresh();
-                }
-                mDraggedItem = null;
-            }
-        }
+        //            SaveAndRefresh();
+        //        }
+        //        mDraggedItem = null;
+        //    }
+        //}
     }
 
     private bool CanDrop()

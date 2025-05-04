@@ -5,7 +5,6 @@ using RenderingLibrary.Math.Geometry;
 using Gum.ToolStates;
 using RenderingLibrary;
 using RenderingLibrary.Graphics;
-using Gum.Input;
 using Gum.DataTypes;
 using System.Windows.Forms;
 using WinCursor = System.Windows.Forms.Cursor;
@@ -17,6 +16,7 @@ using Matrix = System.Numerics.Matrix4x4;
 using Gum.Plugins.InternalPlugins.EditorTab.Services;
 using System.Security.RightsManagement;
 using InputLibrary;
+using MonoGameGum;
 
 namespace Gum.Wireframe;
 
@@ -61,11 +61,11 @@ public class SelectionManager
     #region Properties
 
 
-    public InputLibrary.Cursor Cursor
+    public MonoGameGum.Input.Cursor Cursor
     {
         get
         {
-            return InputLibrary.Cursor.Self;
+            return GumService.Default.Cursor;
         }
     }
 
@@ -259,7 +259,7 @@ public class SelectionManager
     /// to un-highlight anything if the cursor is outside of the window</param>
     void HighlightActivity(bool forceNoHighlight)
     {
-        if (!InputLibrary.Cursor.Self.PrimaryDownIgnoringIsInWindow)
+        if (!GumService.Default.Cursor.PrimaryDown)
         {
             // There is currently a known
             // bug where the user can click+drag
@@ -344,7 +344,7 @@ public class SelectionManager
             // We used to not check this, but we have to now because the cursor might be 
             if(Cursor.IsInWindow)
             {
-                Cursor.SetWinformsCursor(cursorToSet);
+                //Cursor.SetWinformsCursor(cursorToSet);
 
                 // We don't want to show the highlight when the user is performing some kind of editing.
                 // Therefore make sure the cursor isn't down.
@@ -360,7 +360,7 @@ public class SelectionManager
                 }
             }
         }
-        else if(InputLibrary.Cursor.Self.PrimaryDown && Cursor.IsInWindow)
+        else if(GumService.Default.Cursor.PrimaryDown && Cursor.IsInWindow)
         {
             // We only want to hide it if the user is holding the cursor down over the wireframe window.
             HighlightedIpso = null;

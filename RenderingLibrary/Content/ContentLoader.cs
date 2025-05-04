@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using RenderingLibrary.Graphics;
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using ToolsUtilities;
 
@@ -46,7 +47,7 @@ namespace RenderingLibrary.Content
             //}
             else
             {
-                throw new NotImplementedException();
+                throw new NotImplementedException($"Error attempting to load {contentName} of type {typeof(T).AssemblyQualifiedName}");
             }
         }
 
@@ -84,7 +85,7 @@ namespace RenderingLibrary.Content
 
             if(!knownType)
             {
-                throw new NotImplementedException();
+                throw new NotImplementedException($"Could not load {contentName} of type {typeof(T).AssemblyQualifiedName}");
             }
             else
             {

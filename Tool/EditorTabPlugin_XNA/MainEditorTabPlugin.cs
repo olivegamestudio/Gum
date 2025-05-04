@@ -34,7 +34,7 @@ using ToolsUtilities;
 
 namespace Gum.Plugins.InternalPlugins.EditorTab;
 
-[Export(typeof(PluginBase))]
+//[Export(typeof(PluginBase))]
 internal class MainEditorTabPlugin : InternalPlugin
 {
     #region Fields/Properties
@@ -168,9 +168,6 @@ internal class MainEditorTabPlugin : InternalPlugin
         this.WireframeResized += _scrollbarService.HandleWireframeResized;
         this.WireframeRefreshed += HandleWireframeRefreshed;
         this.WireframePropertyChanged += HandleWireframePropertyChanged;
-
-        this.GetWorldCursorPosition += HandleGetWorldCursorPosition;
-
 
         this.UiZoomValueChanged += HandleUiZoomValueChanged;
 
@@ -609,10 +606,6 @@ internal class MainEditorTabPlugin : InternalPlugin
             //DragDropManager.Self.HandleDragOver(sender, e);
 
         };
-
-        // December 29, 2024
-        // AppCenter is dead - do we want to replace this?
-        //_wireframeControl.ErrorOccurred += (exception) => Crashes.TrackError(exception);
 
         this._wireframeControl.QueryContinueDrag += (sender, args) =>
         {

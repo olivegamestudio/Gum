@@ -14,6 +14,7 @@ using Matrix = System.Numerics.Matrix4x4;
 using Gum.Managers;
 using ToolsUtilitiesStandard.Helpers;
 using InputLibrary;
+using MonoGameGum;
 
 namespace Gum.Wireframe.Editors
 {
@@ -46,7 +47,7 @@ namespace Gum.Wireframe.Editors
             {
                 var isOver = false;
 
-                var cursor = InputLibrary.Cursor.Self;
+                var cursor = GumService.Default.Cursor;
 
                 var x = cursor.GetWorldX(SystemManagers.Default);
                 var y = cursor.GetWorldY(SystemManagers.Default);
@@ -252,8 +253,8 @@ namespace Gum.Wireframe.Editors
             if (canUpdatePoint)
             {
 
-                var worldX = InputLibrary.Cursor.Self.GetWorldX(SystemManagers.Default);
-                var worldY = InputLibrary.Cursor.Self.GetWorldY(SystemManagers.Default);
+                var worldX = GumService.Default.Cursor.GetWorldX(SystemManagers.Default);
+                var worldY = GumService.Default.Cursor.GetWorldY(SystemManagers.Default);
 
                 var zoom = Renderer.Self.Camera.Zoom;
 
@@ -284,7 +285,7 @@ namespace Gum.Wireframe.Editors
 
         private void PushActivity()
         {
-            var cursor = InputLibrary.Cursor.Self;
+            var cursor = GumService.Default.Cursor;
             if (cursor.PrimaryPush)
             {
                 var x = cursor.GetWorldX(SystemManagers.Default);
@@ -339,7 +340,7 @@ namespace Gum.Wireframe.Editors
 
         private void ClickActivity()
         {
-            var cursor = InputLibrary.Cursor.Self;
+            var cursor = GumService.Default.Cursor;
 
             if (cursor.PrimaryClick)
             {
@@ -394,7 +395,7 @@ namespace Gum.Wireframe.Editors
         {
             var linePolygon = SelectedLinePolygon;
 
-            var cursor = InputLibrary.Cursor.Self;
+            var cursor = GumService.Default.Cursor;
 
             int? indexOver = grabbedIndex;
 
@@ -426,7 +427,7 @@ namespace Gum.Wireframe.Editors
             }
         }
 
-        private void MoveGrabbedPoint(InputLibrary.Cursor cursor)
+        private void MoveGrabbedPoint(MonoGameGum.Input.Cursor cursor)
         {
             var linePolygon = SelectedLinePolygon;
             mHasChangedAnythingSinceLastPush = true;
@@ -466,7 +467,7 @@ namespace Gum.Wireframe.Editors
         private void BodyGrabbingActivity()
         {
             System.Diagnostics.Debug.WriteLine("Grabbed Index" + grabbedIndex);
-            var cursor = InputLibrary.Cursor.Self;
+            var cursor = GumService.Default.Cursor;
             if (cursor.PrimaryDown && hasGrabbedBodyOrPoint &&
                 grabbedState.HasMovedEnough && grabbedIndex == null)
             {
@@ -536,7 +537,7 @@ namespace Gum.Wireframe.Editors
 
         #region Get/Find methods
 
-        public override System.Windows.Forms.Cursor GetWindowsCursorToShow(Cursor defaultCursor, float worldXAt, float worldYAt)
+        public override System.Windows.Forms.Cursor GetWindowsCursorToShow(System.Windows.Forms.Cursor defaultCursor, float worldXAt, float worldYAt)
         {
             var pointOver = GetIndexOver(worldXAt, worldYAt);
 

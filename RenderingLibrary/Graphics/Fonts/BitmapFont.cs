@@ -1180,8 +1180,11 @@ public class BitmapFont : IDisposable
 
     #region Private Methods
 
-    private AtlasedTexture CheckForLoadedAtlasTexture(string filename)
+    private AtlasedTexture? CheckForLoadedAtlasTexture(string filename)
     {
+#if FNA
+        return null;
+#else
         if (ToolsUtilities.FileManager.IsRelative(filename))
         {
             filename = ToolsUtilities.FileManager.RelativeDirectory + filename;
@@ -1193,6 +1196,7 @@ public class BitmapFont : IDisposable
         var atlasedTexture = global::RenderingLibrary.Content.LoaderManager.Self.TryLoadContent<AtlasedTexture>(filename);
 
         return atlasedTexture;
+#endif
     }
 
     private BitmapCharacterInfo FillBitmapCharacterInfo(
@@ -1221,9 +1225,9 @@ public class BitmapFont : IDisposable
         };
     }
 
-    #endregion
+#endregion
 
-    #endregion
+#endregion
 
     public void Dispose()
     {

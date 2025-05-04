@@ -17,6 +17,7 @@ using System;
 using Gum.PropertyGridHelpers;
 using System.Security.Policy;
 using EditorTabPlugin_XNA.ExtensionMethods;
+using MonoGameGum;
 
 namespace Gum.Wireframe;
 
@@ -80,7 +81,7 @@ public abstract class WireframeEditor
         return false;
     }
 
-    protected void ApplyCursorMovement(InputLibrary.Cursor cursor)
+    protected void ApplyCursorMovement(MonoGameGum.Input.Cursor cursor)
     {
         float xToMoveBy = IsXMovementEnabled 
             ? cursor.XChange / Renderer.Self.Camera.Zoom
@@ -138,7 +139,7 @@ public abstract class WireframeEditor
         var editingCommands = GumCommands.Self.ProjectCommands.ElementCommands;
         var didMove = editingCommands.MoveSelectedObjectsBy(effectiveXToMoveBy, effectiveYToMoveBy);
 
-        bool isLockedToAxis = _hotkeyManager.LockMovementToAxis.IsPressed(InputLibrary.Keyboard.Self);
+        bool isLockedToAxis = _hotkeyManager.LockMovementToAxis.IsPressed(GumService.Default.Keyboard);
 
 
         if (SelectedState.Self.SelectedInstances.Count() == 0 &&

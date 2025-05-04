@@ -1965,19 +1965,22 @@ public partial class GraphicalUiElement : IRenderableIpso, IVisible, INotifyProp
                 }
             }
 
-            if (sizeDependsOnChildren && canOneDimensionChangeOtherDimension)
+            if(this.mContainedObjectAsIpso != null)
             {
-                float widthBeforeSecondLayout = mContainedObjectAsIpso.Width;
-                float heightBeforeSecondLayout = mContainedObjectAsIpso.Height;
-
-                UpdateDimensions(parentWidth, parentHeight, xOrY, considerWrappedStacked: true);
-
-                if (widthBeforeSecondLayout != mContainedObjectAsIpso.Width ||
-                    heightBeforeSecondLayout != mContainedObjectAsIpso.Height)
+                if (sizeDependsOnChildren && canOneDimensionChangeOtherDimension)
                 {
-                    UpdateChildren(childrenUpdateDepth, ChildType.BothAbsoluteAndRelative, skipIgnoreByParentSize: true);
-                }
+                    float widthBeforeSecondLayout = mContainedObjectAsIpso.Width;
+                    float heightBeforeSecondLayout = mContainedObjectAsIpso.Height;
 
+                    UpdateDimensions(parentWidth, parentHeight, xOrY, considerWrappedStacked: true);
+
+                    if (widthBeforeSecondLayout != mContainedObjectAsIpso.Width ||
+                        heightBeforeSecondLayout != mContainedObjectAsIpso.Height)
+                    {
+                        UpdateChildren(childrenUpdateDepth, ChildType.BothAbsoluteAndRelative, skipIgnoreByParentSize: true);
+                    }
+
+                }
             }
         }
 
