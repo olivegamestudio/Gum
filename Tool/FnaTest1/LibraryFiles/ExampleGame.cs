@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Gum.Plugins.InternalPlugins.EditorTab.Services;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGameGum;
 using MonoGameGum.GueDeriving;
@@ -9,9 +10,9 @@ using System.Text;
 using System.Threading.Tasks;
 using ToolsUtilities;
 
-namespace FnaTest1;
+namespace EditorTabPlugin_FNA.LibraryFiles;
 
-public class ExampleGame : Game
+public class FnaGame : Game
 {
     private GraphicsDeviceManager graphics;
     private SpriteBatch sb;
@@ -28,23 +29,15 @@ public class ExampleGame : Game
     public delegate void DrawCallback(SpriteBatch spriteBatch);
 
 
-    GumService Gum => GumService.Default;
-
-    public ExampleGame() : base()
+    public FnaGame() : base()
     {
         graphics = new GraphicsDeviceManager(this);
         graphics.PreferredBackBufferWidth = Resolution.X;
         graphics.PreferredBackBufferHeight = Resolution.Y;
+
+
     }
 
-    protected override void Initialize()
-    {
-        var relativeDirectory = FileManager.RelativeDirectory;
-        Gum.Initialize(this);
-        FileManager.RelativeDirectory = relativeDirectory;
-
-        base.Initialize();
-    }
 
     public void Resize(int width, int height)
     {
@@ -55,13 +48,6 @@ public class ExampleGame : Game
 
     protected override void Update(GameTime gameTime)
     {
-        Gum.Update(gameTime);
-
-        // todo - pull in DragDropManager.
-        // Look at DragDropManager.Activity "todo - move this"
-
-
-
         try
         {
             if (OnUpdate != null)
@@ -85,21 +71,6 @@ public class ExampleGame : Game
     }
 
 
-
-    protected override void Draw(GameTime gameTime)
-    {
-        GraphicsDevice.Clear(Color.CornflowerBlue);
-
-        Gum.Draw();
-
-        //sb.Begin();
-
-        //if (OnDraw != null)
-        //    OnDraw(sb);
-
-
-        //sb.End();
-    }
 
 
 

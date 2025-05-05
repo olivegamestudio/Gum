@@ -1,4 +1,7 @@
-﻿using EditorTabPlugin_XNA.Services;
+﻿using EditorTabPlugin_FNA;
+using EditorTabPlugin_FNA.ViewModels;
+using EditorTabPlugin_FNA.Views;
+using EditorTabPlugin_XNA.Services;
 using Gum;
 using Gum.Commands;
 using Gum.DataTypes;
@@ -13,6 +16,8 @@ using Gum.ToolStates;
 using Gum.Wireframe;
 using GumRuntime;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGameGum;
+using MonoGameGum.Forms;
 using RenderingLibrary;
 using RenderingLibrary.Graphics;
 using System;
@@ -21,6 +26,7 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Media3D;
 using WPFNA;
 
 namespace FnaTest1;
@@ -84,7 +90,9 @@ internal class MainEditorTabPlugin : PluginBase
     private readonly SelectionManager _selectionManager;
     private readonly ElementCommands _elementCommands;
     private readonly SinglePixelTextureService _singlePixelTextureService;
+    private readonly CameraController _cameraController;
     private LayerService _layerService;
+    private CameraViewModel _cameraViewModel;
 
     private EditingManager _editingManager;
 
@@ -100,6 +108,9 @@ internal class MainEditorTabPlugin : PluginBase
         _screenshotService = new ScreenshotService(_selectionManager);
         _elementCommands = ElementCommands.Self;
         _singlePixelTextureService = new SinglePixelTextureService();
+        var hotkeyManager = Gum.Services.Builder.Get<HotkeyManager>();
+        _cameraController = new CameraController(hotkeyManager);
+
     }
 
     public override bool ShutDown(PluginShutDownReason shutDownReason)
@@ -119,7 +130,14 @@ internal class MainEditorTabPlugin : PluginBase
         AssignEvents();
 
 
-        var fnaControl = new FnaControl();
+        var game = new EditorGame(_cameraController);
+        var fnaControl = new EditorWindow(_cameraController, game);
+
+        _cameraViewModel = new CameraViewModel(fnaControl.Camera);
+        fnaControl.DataContext = _cameraViewModel;
+
+        //fnaControl.KeyDown += OnKeyDown;
+
         var tab = this.CreateTab(fnaControl, "FNA test");
         tab.SuggestedLocation = TabLocation.RightTop;
         tab.Show();
@@ -128,6 +146,13 @@ internal class MainEditorTabPlugin : PluginBase
 
         //var tab = GumCommands.Self.GuiCommands.AddControl(fnaControl, "Fna Test");
     }
+
+    //void OnKeyDown(object sender, KeyEventArgs e)
+    //{
+    //    HotkeyManager.Self.HandleKeyDownWireframe(e);
+    //    _cameraController.HandleKeyPress(e);
+
+    //}
 
     private void HandleXnaInitialized()
     {

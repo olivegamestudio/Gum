@@ -1,7 +1,8 @@
 ﻿//© 2021-2025 Bit Kid, Inc.
 //Use at your own risk. No warranty expressed or implied!
 
-using FnaTest1;
+using EditorTabPlugin_FNA.LibraryFiles;
+using Microsoft.Xna.Framework;
 using SDL3;
 using System;
 using System.Diagnostics;
@@ -11,6 +12,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
+using static WPFNA.Win32Api;
 
 namespace WPFNA
 {
@@ -22,23 +24,24 @@ namespace WPFNA
     /// </summary>
     public class FnaControl : HwndHost
     {
-        public ExampleGame Game { get; private set; }
+        public FnaGame Game { get; private set; }
 
         private IntPtr gameHandle = IntPtr.Zero;
         private readonly CancellationTokenSource gameShutingDown = new CancellationTokenSource();
 
         #region Input Events
-        public Action<Microsoft.Xna.Framework.Point> MouseMoveFNA;
-        public Action MouseUpFNA;
-        public Action<MouseButton> MouseDownFNA;
-        public Action MouseEnterFNA;
-        public Action MouseLeaveFNA;
-        public Action<object, Microsoft.Xna.Framework.Point> DropFNA;
+        public event Action<bool, Microsoft.Xna.Framework.Point> MouseMoveFNA;
+        public event Action<MouseButton> MouseUpFNA;
+        public event Action<MouseButton, Microsoft.Xna.Framework.Point> MouseDownFNA;
+        public event Action<int, Microsoft.Xna.Framework.Point> MouseWheelFNA;
+        public event Action MouseEnterFNA;
+        public event Action MouseLeaveFNA;
+        public event Action<object, Microsoft.Xna.Framework.Point> DropFNA;
         #endregion
 
         #region Mouse Vars
         public Microsoft.Xna.Framework.Point MousePosition { get; private set; }
-        public Point MousePositionScreen { get; private set; }
+        public System.Windows.Point MousePositionScreen { get; private set; }
         public bool IsMouseInside { get; private set; }
         public bool WasMouseInside {  get; private set; }
         private Rect windowRect;
@@ -46,7 +49,7 @@ namespace WPFNA
         bool wasDragging;
         #endregion
 
-        public FnaControl()
+        public FnaControl(FnaGame fnaGame)
         {
             //force graphics driver: "SDL_GPU" (default, uses D3D12), "D3D11" or "Vulkan"
             //Environment.SetEnvironmentVariable("FNA3D_FORCE_DRIVER", "D3D11");
@@ -56,7 +59,7 @@ namespace WPFNA
             Debug.WriteLine($"SDL_Init {ret}");
 
             //create game and initialize
-            Game = new ExampleGame();
+            Game = fnaGame;
             Game.RunOneFrame();
 
             //spin up game update thread
@@ -89,8 +92,6 @@ namespace WPFNA
         protected override void DestroyWindowCore(HandleRef hwnd)
         {
             gameShutingDown.Cancel();
-            Game.OnUpdate = null;
-            Game.OnDraw = null;
             Game?.Exit();
             Game = null;
         }
@@ -135,7 +136,7 @@ namespace WPFNA
             var source = PresentationSource.FromVisual(this);
             var transformToDevice = source.CompositionTarget.TransformToDevice;
             var pixelSize = (Size)transformToDevice.Transform((Vector)RenderSize);
-            var windowOrigin = this.PointToScreen(new Point(0,0));
+            var windowOrigin = this.PointToScreen(new System.Windows.Point(0,0));
             windowRect = new Rect(windowOrigin, pixelSize);
             dpiScale = VisualTreeHelper.GetDpi(this);
         }
@@ -179,66 +180,166 @@ namespace WPFNA
             UpdateWindowLocation();
         }
 
+        private HookProc delMouseProc = null;
+        private IntPtr hooked;
+
+        private void hook_mouse()
+        {
+            // initialize our delegate
+            this.delMouseProc = new HookProc(this.MouseProc);
+            hooked = SetWindowsHookEx(HookType.WH_MOUSE_LL, this.delMouseProc, IntPtr.Zero, 0);
+        }
+
+        private void unhook_mouse()
+        {
+            UnhookWindowsHookEx(hooked);
+            hooked = IntPtr.Zero;
+        }
+
+        /// <summary>
+        /// Watch for left mouse button up and determine if the mouse is within our window.
+        /// This is a chain of mouse watches that may not be broken.
+        /// This must process very fast
+        /// </summary>
+        /// <remarks>
+        /// WARNING
+        ///   This runs for all mouse action regularless of the executing application or
+        ///   mouse location. It run in Visual Studio when the XAML is edited.
+        /// </remarks>
+        /// <param name="code"></param>
+        /// <param name="wParam"></param>
+        /// <param name="lParam"></param>
+        /// <returns></returns>
+        private int MouseProc(int code, IntPtr wParam, IntPtr lParam)
+        {
+
+            if (code < 0)
+            {
+                //you need to call CallNextHookEx without further processing
+                //and return the value returned by CallNextHookEx
+                return CallNextHookEx(IntPtr.Zero, code, wParam, lParam);
+            }
+            WM wm = (WM)wParam.ToInt32();
+            if (wm == WM.LBUTTONUP)
+            {
+                MSLLHOOKSTRUCT msll = (MSLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(MSLLHOOKSTRUCT));
+                MousePositionScreen = new System.Windows.Point(msll.pt.X, msll.pt.Y);
+
+                //this is WPF screen scale, not XNA screen scale
+                MousePosition = new Microsoft.Xna.Framework.Point((int)MousePositionScreen.X - (int)windowRect.X,
+                    (int)MousePositionScreen.Y - (int)windowRect.Y);
+                var contains = windowRect.Contains(MousePositionScreen);
+                MousePosition = new Microsoft.Xna.Framework.Point((int)(MousePosition.X / dpiScale.DpiScaleX), (int)(MousePosition.Y / dpiScale.DpiScaleY));
+
+                if (contains)
+                    MouseUpFNA?.Invoke(MouseButton.Left);
+            }
+            else if(wm == WM.MBUTTONUP)
+            {
+                MSLLHOOKSTRUCT msll = (MSLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(MSLLHOOKSTRUCT));
+                MousePositionScreen = new System.Windows.Point(msll.pt.X, msll.pt.Y);
+
+                //this is WPF screen scale, not XNA screen scale
+                MousePosition = new Microsoft.Xna.Framework.Point((int)MousePositionScreen.X - (int)windowRect.X,
+                    (int)MousePositionScreen.Y - (int)windowRect.Y);
+                var contains = windowRect.Contains(MousePositionScreen);
+                MousePosition = new Microsoft.Xna.Framework.Point((int)(MousePosition.X / dpiScale.DpiScaleX), (int)(MousePosition.Y / dpiScale.DpiScaleY));
+
+                if (contains || isMiddleMouseDown)
+                {
+                    isMiddleMouseDown = false;
+                    MouseUpFNA?.Invoke(MouseButton.Middle);
+
+                }
+            }
+
+            //return the value returned by CallNextHookEx
+            return CallNextHookEx(IntPtr.Zero, code, wParam, lParam);
+        }
+
+        Microsoft.Xna.Framework.Point lastMousePosition = new Microsoft.Xna.Framework.Point(0, 0);
+        bool isMiddleMouseDown = false;
         //Handle Mouse and Keyboard Events
         //Note: this seems to swallow key events eventually, not sure why but
         //will cause problems if you want to use Keyboard.GetState in Game class
-        protected override IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        protected override IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, 
+            IntPtr lParam, ref bool handled)
         {
-            switch (msg)
+            var windowsMessage = (WM)msg;
+            switch (windowsMessage)
             {
-                case 0x0200://mouse move
+                case WM.MOUSEMOVE://mouse move
                     handled = true;
                     int x = unchecked((short)(long)lParam);
                     int y = unchecked((short)((long)lParam >> 16));
-                    var pos = new Microsoft.Xna.Framework.Point(x, y);
+                    lastMousePosition = new Microsoft.Xna.Framework.Point(x, y);
 
                     if (MouseMoveFNA != null)
-                        MouseMoveFNA(pos);
+                        MouseMoveFNA(isMiddleMouseDown, lastMousePosition);
                     break;
-                case 0x201: //left mouse down
+                case WM.LBUTTONDOWN: //left mouse down
                     this.Focus();
                     handled = true;
 
                     if (MouseDownFNA != null)
-                        MouseDownFNA(MouseButton.Left);
+                        MouseDownFNA(MouseButton.Left, lastMousePosition);
                     break;
-                case 0x202: //left mouse up
+                case WM.LBUTTONUP: //left mouse up
                     handled = true;
 
                     if (MouseUpFNA != null)
-                        MouseUpFNA();
+                        MouseUpFNA(MouseButton.Left);
                     break;
                 //case 0x203: //left mouse double click
                 //    handled = true;
                 //    // this.Focus();
                 //    break;
-                case 0x0204: //right mouse down
+                case WM.RBUTTONDOWN: //right mouse down
                     handled = true;
 
                     if (MouseDownFNA != null)
-                        MouseDownFNA(MouseButton.Right);
+                        MouseDownFNA(MouseButton.Right, lastMousePosition);
                     break;
-                case 0x0205: //right mouse up
+                case WM.RBUTTONUP: //right mouse up
                     handled = true;
 
                     if (MouseUpFNA != null)
-                        MouseUpFNA();
+                        MouseUpFNA(MouseButton.Right);
                     break;
                 //case 0x0206: //right mouse double click
                 //    handled = true;
                 //    break;
-                case 0x0207: //middle mouse down
+                case WM.MBUTTONDOWN: //middle mouse down
                     handled = true;
-
+                    isMiddleMouseDown = true;
                     if (MouseDownFNA != null)
-                        MouseDownFNA(MouseButton.Middle);
+                        MouseDownFNA(MouseButton.Middle, lastMousePosition);
                     break;
-                case 0x0208: //middle mouse up
+                case WM.MBUTTONUP: //middle mouse up
                     handled = true;
+                    isMiddleMouseDown = false;
 
                     if (MouseUpFNA != null)
-                        MouseUpFNA();
+                        MouseUpFNA(MouseButton.Middle);
                     break;
+                case WM.MOUSEWHEEL:
+                    handled = true;
+
+                    short delta = (short)((wParam.ToInt64() >> 16) & 0xFFFF);
+
+                    System.Diagnostics.Debug.WriteLine($"Mouse wheel: {lParam} delta: {delta}");
+
+                    MouseWheelFNA?.Invoke(delta, lastMousePosition);
+
+
+                    break;
+            }
+
+            if(!handled)
+            {
+                var asVm = (WM)msg;
+
+                System.Diagnostics.Debug.WriteLine($"Not processed: {asVm} " + msg.ToString("X"));
             }
 
             return base.WndProc(hwnd, msg, wParam, lParam, ref handled);
