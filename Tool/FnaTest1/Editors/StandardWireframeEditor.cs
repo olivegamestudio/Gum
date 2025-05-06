@@ -20,6 +20,7 @@ using Gum.ToolCommands;
 using InputLibrary;
 using MonoGameGum;
 using EditorTabPlugin_XNA.ExtensionMethods;
+using Gum.Commands;
 
 namespace Gum.Wireframe.Editors
 {
@@ -74,9 +75,14 @@ namespace Gum.Wireframe.Editors
 
         #endregion
 
-        public StandardWireframeEditor(Layer layer, Color lineColor, Color textColor, 
+        public StandardWireframeEditor(Layer layer, 
+            Color lineColor, 
+            Color textColor, 
             global::Gum.Managers.HotkeyManager hotkeyManager,
-            SelectionManager selectionManager)
+            SelectionManager selectionManager,
+            ToolFontService toolFontService,
+            GuiCommands guiCommands,
+            SystemManagers systemManagers)
             : base(hotkeyManager, selectionManager)
         {
             _elementCommands = GumCommands.Self.ProjectCommands.ElementCommands;
@@ -91,12 +97,12 @@ namespace Gum.Wireframe.Editors
             ShapeManager.Self.Add(rotationHandle, layer);
             rotationHandle.Visible = false;
 
-            widthDimensionDisplay = new DimensionDisplay();
-            widthDimensionDisplay.AddToManagers(SystemManagers.Default, layer);
+            widthDimensionDisplay = new DimensionDisplay(toolFontService, guiCommands);
+            widthDimensionDisplay.AddToManagers(systemManagers, layer);
             widthDimensionDisplay.SetColor(lineColor, textColor);
 
-            heightDimensionDisplay = new DimensionDisplay();
-            heightDimensionDisplay.AddToManagers(SystemManagers.Default, layer);
+            heightDimensionDisplay = new DimensionDisplay(toolFontService, guiCommands);
+            heightDimensionDisplay.AddToManagers(systemManagers, layer);
             heightDimensionDisplay.SetColor(lineColor, textColor);
 
         }

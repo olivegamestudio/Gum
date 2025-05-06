@@ -13,7 +13,7 @@ namespace Gum.Managers
     /// <summary>
     /// Manages fonts used by the app, as opposed to fonts used by the loaded project
     /// </summary>
-    public class ToolFontService : Singleton<ToolFontService>
+    public class ToolFontService
         // todo - eventually move to a service locator or full DI
     {
         BitmapFont _toolFont;
@@ -21,7 +21,7 @@ namespace Gum.Managers
         {
             get => _toolFont;
         }
-        public void Initialize()
+        public void Initialize(SystemManagers systemManagers)
         {
             // This is the plugin, which doesn't have the font...
             //var executingPath = Assembly.GetExecutingAssembly().Location;
@@ -30,7 +30,7 @@ namespace Gum.Managers
             var directory = Path.GetDirectoryName(executingPath);
 
             var fntFilePath = Path.Combine(directory, "Content/Fonts/Font18Arial_o1.fnt");
-            var font = new BitmapFont(fntFilePath, SystemManagers.Default);
+            var font = new BitmapFont(fntFilePath, systemManagers);
 
             _toolFont = font;
         }

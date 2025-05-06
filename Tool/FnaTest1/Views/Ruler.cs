@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using RenderingLibrary;
-using XnaAndWinforms;
 using RenderingLibrary.Graphics;
 using RenderingLibrary.Math.Geometry;
 using InputLibrary;
@@ -11,12 +10,12 @@ using Sprite = RenderingLibrary.Graphics.Sprite;
 using Camera = RenderingLibrary.Camera;
 using RenderingLibrary.Math;
 using Gum.ToolStates;
-using Gum.Input;
 using Vector2 = System.Numerics.Vector2;
 using Color = System.Drawing.Color;
 using Gum.Managers;
 using Gum.Plugins.InternalPlugins.EditorTab.Services;
 using Gum.Wireframe;
+using MonoGameGum.Input;
 
 namespace Gum.Plugins.InternalPlugins.EditorTab.Views
 {
@@ -37,9 +36,9 @@ namespace Gum.Plugins.InternalPlugins.EditorTab.Views
         private ToolLayerService _toolLayerService;
         //GraphicsDeviceControl mControl;
         SystemManagers mManagers;
-        //Cursor mCursor;
+        Cursor _cursor;
         private readonly LayerService _layerService;
-        //Keyboard mKeyboard;
+        Keyboard mKeyboard;
 
         SolidRectangle mRectangle;
         List<Line> mRulerLines = new List<Line>();
@@ -126,20 +125,7 @@ namespace Gum.Plugins.InternalPlugins.EditorTab.Views
             }
         }
 
-        Renderer Renderer
-        {
-            get
-            {
-                if (mManagers == null)
-                {
-                    return Renderer.Self;
-                }
-                else
-                {
-                    return mManagers.Renderer;
-                }
-            }
-        }
+        Renderer Renderer => mManagers.Renderer;
 
         ShapeManager ShapeManager
         {
@@ -253,16 +239,20 @@ namespace Gum.Plugins.InternalPlugins.EditorTab.Views
 
 
 
-        public Ruler( SystemManagers managers, 
-            ToolFontService toolFontService, ToolLayerService toolLayerService, LayerService layerService)
+        public Ruler( SystemManagers managers,
+            Cursor cursor,
+            Keyboard keyboard,
+            ToolFontService toolFontService, 
+            ToolLayerService toolLayerService, 
+            LayerService layerService)
         {
             _toolFontService = toolFontService;
             _toolLayerService = toolLayerService;
 
             //mControl = control;
-            //mKeyboard = keyboard;
+            mKeyboard = keyboard;
             mManagers = managers;
-            //mCursor = cursor;
+            _cursor = cursor;
 
             _layerService = layerService;
 
@@ -291,11 +281,11 @@ namespace Gum.Plugins.InternalPlugins.EditorTab.Views
 
         }
 
-        public bool HandleXnaUpdate(bool isCursorInWindow)
+        public bool HandleXnaUpdate()
         {
             IsCursorOver = false;
             UpdateOffsetSpritePosition();
-
+            bool isCursorInWindow = _cursor.IsInWindow;
             bool isOver = PerformGuidesActivity(isCursorInWindow);
 
             if (isCursorInWindow)
@@ -410,11 +400,11 @@ namespace Gum.Plugins.InternalPlugins.EditorTab.Views
             float guideSpacePosition;
             if (RulerSide == RulerSide.Left)
             {
-                guideSpacePosition = mCursor.Y - mOffsetSprite.Y + nudgeYOffset;
+                guideSpacePosition = _cursor.Y - mOffsetSprite.Y + nudgeYOffset;
             }
             else
             {
-                guideSpacePosition = mCursor.X - mOffsetSprite.X + nudgeXOffset;
+                guideSpacePosition = _cursor.X - mOffsetSprite.X + nudgeXOffset;
             }
 
 
@@ -447,24 +437,24 @@ namespace Gum.Plugins.InternalPlugins.EditorTab.Views
                     cursorToSet = System.Windows.Forms.Cursors.SizeWE;
                 }
 
-                mCursor.SetWinformsCursor(cursorToSet);
+                //mCursor.SetWinformsCursor(cursorToSet);
             }
 
             // Remove the guide if it is right-clicked
-            if (mCursor.IsInWindow && mCursor.SecondaryPush && guideOver != null)
+            if (_cursor.IsInWindow && _cursor.SecondaryPush && guideOver != null)
             {
                 mGuides.Remove(guideOver);
                 ShapeManager.Remove(guideOver);
             }
 
-            if (mCursor.IsInWindow && mCursor.PrimaryPush)
+            if (_cursor.IsInWindow && _cursor.PrimaryPush)
             {
                 mGrabbedGuide = guideOver;
                 nudgeXOffset = 0;
                 nudgeYOffset = 0;
 
             }
-            if (mCursor.PrimaryDown && mGrabbedGuide != null)
+            if (_cursor.PrimaryDown && mGrabbedGuide != null)
             {
 
                 if (RulerSide == RulerSide.Left)
@@ -499,7 +489,7 @@ namespace Gum.Plugins.InternalPlugins.EditorTab.Views
 
             UpdateDistanceArrows(GuideLineColor, GuideTextColor);
 
-            if (!mCursor.PrimaryDown)
+            if (!_cursor.PrimaryDown)
             {
                 if (mGrabbedGuide != null && !isCursorInWindow)
                 {
@@ -522,7 +512,7 @@ namespace Gum.Plugins.InternalPlugins.EditorTab.Views
             DistanceArrow2.Zoom = mZoomValue;
 
 
-            if (mCursor.PrimaryDown && mGrabbedGuide != null)
+            if (_cursor.PrimaryDown && mGrabbedGuide != null)
             {
                 DistanceArrow1.TextColor = guideTextColor;
                 DistanceArrow1.ArrowColor = guideLineColor;
@@ -555,7 +545,7 @@ namespace Gum.Plugins.InternalPlugins.EditorTab.Views
                         yBelow = GraphicalUiElement.CanvasHeight;
                     }
 
-                    var x = mCursor.GetWorldX();
+                    var x = _cursor.GetWorldX(mManagers);
 
                     if (yAbove != null)
                     {
@@ -594,7 +584,7 @@ namespace Gum.Plugins.InternalPlugins.EditorTab.Views
                         xRight = GraphicalUiElement.CanvasWidth;
                     }
 
-                    var y = mCursor.GetWorldY();
+                    var y = _cursor.GetWorldY(mManagers);
 
                     if (xLeft != null)
                     {
@@ -626,7 +616,7 @@ namespace Gum.Plugins.InternalPlugins.EditorTab.Views
             //const float distanceFromEdge = 10;
             const float distanceFromEdge = 30;
             _grabbedGuideText.Visible = false;
-            if (mCursor.PrimaryDown && mGrabbedGuide != null)
+            if (_cursor.PrimaryDown && mGrabbedGuide != null)
             {
                 _grabbedGuideText.Visible = true;
                 _grabbedGuideText.Color = guideTextColor;
@@ -651,10 +641,10 @@ namespace Gum.Plugins.InternalPlugins.EditorTab.Views
         private bool HandleAddingGuides()
         {
             bool toReturn = false;
-            float x = mCursor.X;
-            float y = mCursor.Y;
+            float x = _cursor.X;
+            float y = _cursor.Y;
 
-            if (mCursor.PrimaryClick)
+            if (_cursor.PrimaryClick)
             {
                 if (x > mRectangle.X && x < mRectangle.X + mRectangle.Width &&
                     y > mRectangle.Y && y < mRectangle.Y + mRectangle.Height)

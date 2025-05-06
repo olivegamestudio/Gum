@@ -17,6 +17,8 @@ using Gum.Plugins.InternalPlugins.EditorTab.Services;
 using System.Security.RightsManagement;
 using InputLibrary;
 using MonoGameGum;
+using Gum.Managers;
+using Gum.Commands;
 
 namespace Gum.Wireframe;
 
@@ -45,7 +47,8 @@ public class SelectionManager
     #region Fields
     
     LayerService _layerService;
-
+    private ToolFontService _toolFontService;
+    private SystemManagers _systemManagers;
     public WireframeEditor WireframeEditor;
 
     List<GraphicalUiElement> mSelectedIpsos = new List<GraphicalUiElement>();
@@ -63,15 +66,13 @@ public class SelectionManager
 
     public MonoGameGum.Input.Cursor Cursor
     {
-        get
-        {
-            return GumService.Default.Cursor;
-        }
+        get; private set;
     }
 
 
     ISelectedState _selectedState;
     private readonly EditingManager _editingManager;
+    private readonly GuiCommands _guiCommands;
 
     public bool IsOverBody
     {
@@ -182,16 +183,25 @@ public class SelectionManager
 
     #region Methods
 
-    internal SelectionManager(ISelectedState selectedState, EditingManager editingManager)
+    internal SelectionManager(ISelectedState selectedState, 
+        EditingManager editingManager,
+        GuiCommands guiCommands)
     {
         _selectedState = selectedState;
         _editingManager = editingManager;
-
+        _guiCommands = guiCommands;
     }
 
-    public void Initialize(LayerService layerService)
+    public void Initialize(LayerService layerService, 
+        ToolFontService toolFontService,
+        SystemManagers systemManagers,
+        MonoGameGum.Input.Cursor cursor)
     {
+        Cursor = cursor;
         _layerService = layerService;
+        _toolFontService = toolFontService;
+        _systemManagers = systemManagers;
+
         var overlayLayer = layerService.OverlayLayer;
 
         mGraphicalOutline = new GraphicalOutline(overlayLayer);
@@ -350,12 +360,15 @@ public class SelectionManager
                 // Therefore make sure the cursor isn't down.
                 if (representationOver != null && Cursor.PrimaryDown == false)
                 {
+                    System.Diagnostics.Debug.WriteLine($"1");
+
                     HighlightedIpso = representationOver;
 
                     mGraphicalOutline.UpdateHighlightElements();
                 }
                 else
                 {
+                    System.Diagnostics.Debug.WriteLine($"2");
                     HighlightedIpso = null;
                 }
             }
@@ -363,11 +376,13 @@ public class SelectionManager
         else if(GumService.Default.Cursor.PrimaryDown && Cursor.IsInWindow)
         {
             // We only want to hide it if the user is holding the cursor down over the wireframe window.
+                    System.Diagnostics.Debug.WriteLine($"3");
             HighlightedIpso = null;
         }
 
         if (forceNoHighlight)
         {
+                    System.Diagnostics.Debug.WriteLine($"4");
             HighlightedIpso = null;
         }
         
@@ -627,8 +642,13 @@ public class SelectionManager
 
                 WireframeEditor = new StandardWireframeEditor(
                     _layerService.OverlayLayer, 
-                    lineColor, textColor, global::Gum.Managers.HotkeyManager.Self,
-                    this);
+                    lineColor, 
+                    textColor, 
+                    global::Gum.Managers.HotkeyManager.Self,
+                    this,
+                    _toolFontService,
+                    _guiCommands,
+                    _systemManagers);
             }
         }
         else if(WireframeEditor != null)

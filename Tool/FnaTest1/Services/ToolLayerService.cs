@@ -8,23 +8,25 @@ using System.Threading.Tasks;
 
 namespace Gum.Managers
 {
-    public class ToolLayerService : Singleton<ToolLayerService>
+    public class ToolLayerService
     {
+        private SystemManagers _systemManagers;
 
         public Layer TopLayer { get; private set; }
 
-        public void Initialize()
+        public void Initialize(SystemManagers systemManagers)
         {
-            TopLayer = SystemManagers.Default.Renderer.AddLayer();
+            _systemManagers = systemManagers;
+            TopLayer = _systemManagers.Renderer.AddLayer();
         }
 
         public void Activity()
         {
             // just in case another plugin adds more layers, keep this one on top:
-            if(SystemManagers.Default.Renderer.Layers.Last() != TopLayer)
+            if(_systemManagers.Renderer.Layers.Last() != TopLayer)
             {
-                SystemManagers.Default.Renderer.RemoveLayer(TopLayer);
-                SystemManagers.Default.Renderer.AddLayer(TopLayer);
+                _systemManagers.Renderer.RemoveLayer(TopLayer);
+                _systemManagers.Renderer.AddLayer(TopLayer);
             }
         }
     }

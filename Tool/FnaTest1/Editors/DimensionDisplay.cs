@@ -40,10 +40,11 @@ namespace Gum.Wireframe.Editors
 
         #endregion
 
-        public DimensionDisplay()
+        public DimensionDisplay(ToolFontService toolFontService, 
+            GuiCommands guiCommands)
         {
-            _toolFontService = ToolFontService.Self;
-            _guiCommands = GumCommands.Self.GuiCommands;
+            _toolFontService = toolFontService;
+            _guiCommands = guiCommands;
         }
 
         public void AddToManagers(SystemManagers systemManagers, Layer layer)

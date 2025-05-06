@@ -235,7 +235,13 @@ public class Cursor : ICursor
         // do we want to change X and Y?
     }
 
-    public void Activity(double currentTime)
+    /// <summary>
+    /// Updates all internal values according to the current time and an optional mouse state.
+    /// If no mouseState is specified, then the internal Mouse.GetMouseState method is used.
+    /// </summary>
+    /// <param name="currentTime">The current time in seconds since the game has started.</param>
+    /// <param name="mouseState">An optional mouse state. Most games do not need to provide this.</param>
+    public void Activity(double currentTime, MouseState? mouseState = null)
     {
         mLastFrameMouseState = _mouseState;
         _lastFrameTouchCollection = _touchCollection;
@@ -260,7 +266,7 @@ public class Cursor : ICursor
         {
             LastInputDevice = InputDevice.Mouse;
 
-            _mouseState = Microsoft.Xna.Framework.Input.Mouse.GetState();
+            _mouseState = mouseState ?? Microsoft.Xna.Framework.Input.Mouse.GetState();
             x = _mouseState.X;
             y = _mouseState.Y;
         }

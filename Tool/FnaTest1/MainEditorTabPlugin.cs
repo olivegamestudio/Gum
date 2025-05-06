@@ -19,6 +19,7 @@ using GumRuntime;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGameGum;
 using MonoGameGum.Forms;
+using MonoGameGum.Input;
 using RenderingLibrary;
 using RenderingLibrary.Graphics;
 using System;
@@ -95,7 +96,12 @@ internal class MainEditorTabPlugin : PluginBase
     private BackgroundSpriteService _backgroundSpriteService;
     private CanvasBoundsService _canvasBoundsService;
     private LayerService _layerService;
+    private ToolLayerService _toolLayerService;
+    private ToolFontService _toolFontService;
     private CameraViewModel _cameraViewModel;
+    private readonly RulerService _rulerService;
+    private Cursor _cursor;
+    private Keyboard _keyboard;
 
     private EditingManager _editingManager;
 
@@ -107,7 +113,9 @@ internal class MainEditorTabPlugin : PluginBase
         _guiCommands = Gum.Services.Builder.Get<GuiCommands>();
         _localizationManager = Gum.Services.Builder.Get<LocalizationManager>();
         _editingManager = new EditingManager();
-        _selectionManager = new SelectionManager(SelectedState.Self, _editingManager);
+        _selectionManager = new SelectionManager(SelectedState.Self,
+            _editingManager,
+            GumCommands.Self.GuiCommands);
         _screenshotService = new ScreenshotService(_selectionManager);
         _elementCommands = ElementCommands.Self;
         _singlePixelTextureService = new SinglePixelTextureService();
@@ -116,6 +124,9 @@ internal class MainEditorTabPlugin : PluginBase
         _backgroundSpriteService = new BackgroundSpriteService();
         _canvasBoundsService = new CanvasBoundsService();
         _layerService = new LayerService();
+        _rulerService = new RulerService();
+        _toolLayerService = new ToolLayerService();
+        _toolFontService = new ToolFontService();
     }
 
     public override bool ShutDown(PluginShutDownReason shutDownReason)
@@ -140,17 +151,35 @@ internal class MainEditorTabPlugin : PluginBase
         // get called
         game.Initialized += () =>
         {
+            _cursor = new Cursor();
+            _keyboard = new Keyboard();
+
             _layerService.Initialize();
             _backgroundSpriteService.Initialize(game.SystemManagers);
             _canvasBoundsService.Initialize(_layerService);
-            
+            _toolLayerService.Initialize(game.SystemManagers);
+            _rulerService.Initialize(_layerService,
+                game.SystemManagers,
+                _cursor,
+                _keyboard,
+                _toolFontService,
+                _toolLayerService);
+
+            _selectionManager.Initialize(_layerService,
+                _toolFontService,
+                game.SystemManagers, 
+                _cursor);
+
+
         };
 
         var fnaControl = new EditorWindow(
             _cameraController, 
             _backgroundSpriteService, 
             game,
-            _canvasBoundsService);
+            _canvasBoundsService,
+            _rulerService,
+            _selectionManager);
 
         _cameraViewModel = new CameraViewModel(game.SystemManagers.Renderer.Camera);
         fnaControl.DataContext = _cameraViewModel;
@@ -184,7 +213,6 @@ internal class MainEditorTabPlugin : PluginBase
         //_wireframeControl.Initialize(_wireframeEditControl, gumEditorPanel, HotkeyManager.Self, _selectionManager);
 
         // _layerService must be created after _wireframeControl so that the SystemManagers.Default are assigned
-        _selectionManager.Initialize(_layerService);
 
         //_wireframeControl.ShareLayerReferences(_layerService);
 
@@ -389,9 +417,6 @@ internal class MainEditorTabPlugin : PluginBase
 
     private void HandleWireframeRefreshed()
     {
-        // todo...
-        //_wireframeControl.UpdateCanvasBoundsToProject();
-
         _selectionManager.Refresh();
     }
 
@@ -404,6 +429,7 @@ internal class MainEditorTabPlugin : PluginBase
 
     private void HandleGuidesChanged()
     {
+        _rulerService.RefreshGuides();
         //_wireframeControl.RefreshGuides();
     }
 

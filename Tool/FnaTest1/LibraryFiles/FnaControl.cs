@@ -8,6 +8,7 @@ using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
@@ -63,9 +64,21 @@ namespace WPFNA
             Game.RunOneFrame();
 
             //spin up game update thread
-            var gameThread = new Thread(GameExecution);
-            gameThread.SetApartmentState(ApartmentState.STA);
-            gameThread.Start();
+            //var gameThread = new Thread(GameExecution);
+            //gameThread.SetApartmentState(ApartmentState.STA);
+            //gameThread.Start();
+            // Update 
+            // If we do
+            // it in its
+            // own therad, 
+            // then accessing
+            // any UI properties
+            // requires some way of
+            // communicating across the
+            // threads or else we get a crash.
+            // Instead, I just run an async loop
+            GameExecution();
+
         }
 
         protected override HandleRef BuildWindowCore(HandleRef hwndParent)
@@ -97,7 +110,7 @@ namespace WPFNA
         }
 
         // Run the Game in its own thread, to prevent GL ugliness
-        private void GameExecution()
+        private async void GameExecution()
         {
             Debug.WriteLine("Game Loop started");
             var shutdownToken = gameShutingDown.Token;
@@ -107,6 +120,9 @@ namespace WPFNA
                 Game?.RunOneFrame();
                 UpdateMouseLocation();
                 UpdateDragDrop();
+
+                // testing
+                await Task.Delay(1);
             }
 
             Debug.WriteLine("Game stopped");
@@ -335,12 +351,12 @@ namespace WPFNA
                     break;
             }
 
-            if(!handled)
-            {
-                var asVm = (WM)msg;
+            //if(!handled)
+            //{
+            //    var asVm = (WM)msg;
 
-                System.Diagnostics.Debug.WriteLine($"Not processed: {asVm} " + msg.ToString("X"));
-            }
+            //    System.Diagnostics.Debug.WriteLine($"Not processed: {asVm} " + msg.ToString("X"));
+            //}
 
             return base.WndProc(hwnd, msg, wParam, lParam, ref handled);
         }
