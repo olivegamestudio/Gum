@@ -1,6 +1,9 @@
 ﻿using EditorTabPlugin_FNA.LibraryFiles;
+using EditorTabPlugin_FNA.Services;
 using EditorTabPlugin_FNA.ViewModels;
+using EditorTabPlugin_XNA.Services;
 using Gum.Plugins.InternalPlugins.EditorTab.Services;
+using Microsoft.Xna.Framework;
 using RenderingLibrary;
 using System;
 using System.Collections.Generic;
@@ -13,23 +16,36 @@ namespace EditorTabPlugin_FNA.Views;
 internal class EditorWindow : FnaControl
 {
     private readonly CameraController _cameraController;
-
-    // to do- make this not use the default, instead give it its own
-    // instance:
-    public Camera Camera => SystemManagers.Default.Renderer.Camera;
+    private readonly EditorGame _game;
+    private readonly BackgroundSpriteService _backgroundSpriteService;
+    private readonly CanvasBoundsService _canvasBoundsService;
 
     CameraViewModel ViewModel => DataContext as CameraViewModel;
 
-    public EditorWindow(CameraController cameraController, FnaGame fnaGame) : base(fnaGame)
+    public EditorWindow(
+        CameraController cameraController, 
+        BackgroundSpriteService backgroundSpriteService, 
+        EditorGame game,
+        CanvasBoundsService canvasBoundsService
+        ) : base(game)
     {
         _cameraController = cameraController;
-        _cameraController.Camera = Camera;
+        _game = game;
+        _backgroundSpriteService = backgroundSpriteService;
+        _canvasBoundsService = canvasBoundsService;
 
+        _cameraController.Camera = _game.SystemManagers.Renderer.Camera;
+        _game.Updated += HandleEveryFrameUpdate;
         MouseDownFNA += HandleMouseDown;
         MouseMoveFNA += HandleMouseMove;
         MouseWheelFNA += HandleMouseWheel;
     }
 
+    private void HandleEveryFrameUpdate(GameTime time)
+    {
+        _backgroundSpriteService.Activity();
+        _canvasBoundsService.Activity();
+    }
 
     internal void HandleMouseDown(System.Windows.Input.MouseButton e, Microsoft.Xna.Framework.Point position)
     {

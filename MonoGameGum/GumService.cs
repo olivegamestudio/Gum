@@ -79,6 +79,16 @@ public class GumService
     /// <returns>The loaded project, or null if no project is loaded</returns>
     public GumProjectSave? Initialize(Game game, string? gumProjectFile = null)
     {
+        if (game.GraphicsDevice == null)
+        {
+            throw new InvalidOperationException(
+                "game.GraphicsDevice cannot be null. " +
+                "Be sure to call Initialize in the Game's Initialize method or later " +
+                "so that the Game has a valid GrahicsDevice");
+        }
+
+
+
         return InitializeInternal(game, game.GraphicsDevice, gumProjectFile);
     }
 
@@ -129,6 +139,7 @@ public class GumService
         {
             throw new InvalidOperationException("Initialize has already been called once. It cannot be called again");
         }
+        
         hasBeenInitialized = true;
 
         _game = game;

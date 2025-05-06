@@ -5,6 +5,7 @@ using MonoGameGum;
 using MonoGameGum.GueDeriving;
 using System;
 using System.Collections.Generic;
+using System.Data.Odbc;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,10 +23,10 @@ public class FnaGame : Game
     private int resizeWidth;
     private int resizeHeight;
 
-    public UpdateCallback OnUpdate;
+    public event Action Initialized;
+    public event Action<GameTime> Updated;
     public DrawCallback OnDraw;
 
-    public delegate void UpdateCallback(GameTime gameTime);
     public delegate void DrawCallback(SpriteBatch spriteBatch);
 
 
@@ -46,12 +47,18 @@ public class FnaGame : Game
         resizeHeight = height;
     }
 
+    protected override void Initialize()
+    {
+        Initialized?.Invoke();
+        base.Initialize();
+
+    }
+
     protected override void Update(GameTime gameTime)
     {
         try
         {
-            if (OnUpdate != null)
-                OnUpdate(gameTime);
+            Updated?.Invoke(gameTime);
 
             if (doResize && GraphicsDevice.GraphicsDeviceStatus == GraphicsDeviceStatus.Normal)
             {
@@ -69,8 +76,6 @@ public class FnaGame : Game
         }
         base.Update(gameTime);
     }
-
-
 
 
 

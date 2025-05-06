@@ -10,11 +10,16 @@ using System.Threading.Tasks;
 using ToolsUtilities;
 using Color = Microsoft.Xna.Framework.Color;
 using Gum.Plugins.InternalPlugins.EditorTab.Services;
+using RenderingLibrary;
+using Gum;
 
 namespace EditorTabPlugin_FNA;
 internal class EditorGame : FnaGame
 {
     private readonly CameraController _cameraController;
+
+    // todo - make this use its own instance...
+    public SystemManagers SystemManagers => SystemManagers.Default;
 
     GumService Gum => GumService.Default;
 
@@ -28,6 +33,8 @@ internal class EditorGame : FnaGame
         var relativeDirectory = FileManager.RelativeDirectory;
         Gum.Initialize(this);
         FileManager.RelativeDirectory = relativeDirectory;
+
+
 
         base.Initialize();
     }
@@ -50,7 +57,12 @@ internal class EditorGame : FnaGame
 
     protected override void Draw(GameTime gameTime)
     {
-        GraphicsDevice.Clear(Color.CornflowerBlue);
+        var clearColor = new Microsoft.Xna.Framework.Color(
+        ProjectManager.Self.GeneralSettingsFile.CheckerColor1R,
+                ProjectManager.Self.GeneralSettingsFile.CheckerColor1G,
+                ProjectManager.Self.GeneralSettingsFile.CheckerColor1B);
+
+        GraphicsDevice.Clear(clearColor);
 
         Gum.Draw();
 

@@ -1,4 +1,5 @@
 ﻿using EditorTabPlugin_FNA;
+using EditorTabPlugin_FNA.Services;
 using EditorTabPlugin_FNA.ViewModels;
 using EditorTabPlugin_FNA.Views;
 using EditorTabPlugin_XNA.Services;
@@ -91,6 +92,8 @@ internal class MainEditorTabPlugin : PluginBase
     private readonly ElementCommands _elementCommands;
     private readonly SinglePixelTextureService _singlePixelTextureService;
     private readonly CameraController _cameraController;
+    private BackgroundSpriteService _backgroundSpriteService;
+    private CanvasBoundsService _canvasBoundsService;
     private LayerService _layerService;
     private CameraViewModel _cameraViewModel;
 
@@ -110,7 +113,9 @@ internal class MainEditorTabPlugin : PluginBase
         _singlePixelTextureService = new SinglePixelTextureService();
         var hotkeyManager = Gum.Services.Builder.Get<HotkeyManager>();
         _cameraController = new CameraController(hotkeyManager);
-
+        _backgroundSpriteService = new BackgroundSpriteService();
+        _canvasBoundsService = new CanvasBoundsService();
+        _layerService = new LayerService();
     }
 
     public override bool ShutDown(PluginShutDownReason shutDownReason)
@@ -131,9 +136,23 @@ internal class MainEditorTabPlugin : PluginBase
 
 
         var game = new EditorGame(_cameraController);
-        var fnaControl = new EditorWindow(_cameraController, game);
+        // Initialized has to be assigned before creating the fna control or else it won't
+        // get called
+        game.Initialized += () =>
+        {
+            _layerService.Initialize();
+            _backgroundSpriteService.Initialize(game.SystemManagers);
+            _canvasBoundsService.Initialize(_layerService);
+            
+        };
 
-        _cameraViewModel = new CameraViewModel(fnaControl.Camera);
+        var fnaControl = new EditorWindow(
+            _cameraController, 
+            _backgroundSpriteService, 
+            game,
+            _canvasBoundsService);
+
+        _cameraViewModel = new CameraViewModel(game.SystemManagers.Renderer.Camera);
         fnaControl.DataContext = _cameraViewModel;
 
         //fnaControl.KeyDown += OnKeyDown;
@@ -158,7 +177,6 @@ internal class MainEditorTabPlugin : PluginBase
     {
         //_scrollbarService.HandleWireframeInitialized(_wireframeControl, gumEditorPanel);
 
-        _layerService = new LayerService();
 
 
         //_wireframeEditControl.ZoomChanged += HandleControlZoomChange;
@@ -166,7 +184,6 @@ internal class MainEditorTabPlugin : PluginBase
         //_wireframeControl.Initialize(_wireframeEditControl, gumEditorPanel, HotkeyManager.Self, _selectionManager);
 
         // _layerService must be created after _wireframeControl so that the SystemManagers.Default are assigned
-        _layerService.Initialize();
         _selectionManager.Initialize(_layerService);
 
         //_wireframeControl.ShareLayerReferences(_layerService);

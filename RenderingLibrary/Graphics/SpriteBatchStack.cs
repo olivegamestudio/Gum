@@ -125,6 +125,12 @@ namespace RenderingLibrary.Graphics
 
         public SpriteBatchStack(GraphicsDevice graphicsDevice)
         {
+#if DEBUG
+            if(graphicsDevice == null)
+            {
+                throw new ArgumentNullException("graphicsDevice", "A non-null GraphicsDevice is required to create the SpriteBatchStack");
+            }
+#endif
             SpriteBatch = new SpriteBatch(graphicsDevice);
         }
 
