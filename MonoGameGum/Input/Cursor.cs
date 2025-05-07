@@ -280,7 +280,10 @@ public class Cursor : ICursor
         var lastFrameTouchCollectionCount = 0;
         try
         {
-            lastFrameTouchCollectionCount = _lastFrameTouchCollection.Count;
+            if(_lastFrameTouchCollection.IsConnected)
+            {
+                lastFrameTouchCollectionCount = _lastFrameTouchCollection.Count;
+            }
         }
         // FNA crashes here (maybe because XNA did?) if lastFrameTouchCollectionCount.GetState has never been called
         catch { }

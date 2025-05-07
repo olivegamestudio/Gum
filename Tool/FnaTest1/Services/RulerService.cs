@@ -39,20 +39,23 @@ internal class RulerService
         Cursor cursor,
         Keyboard keyboard,
         ToolFontService toolFontService,
-        ToolLayerService toolLayerService)
+        ToolLayerService toolLayerService,
+        WindowsCursorLogic windowsCursorLogic)
     { 
         mTopRuler = new Ruler(systemManagers,
             cursor,
             keyboard,
             toolFontService,
             toolLayerService,
-            layerService);
+            layerService,
+            windowsCursorLogic);
         mLeftRuler = new Ruler(systemManagers,
             cursor,
             keyboard,
             toolFontService,
             toolLayerService,
-            layerService);
+            layerService,
+            windowsCursorLogic);
         mLeftRuler.RulerSide = RulerSide.Left;
 
         _systemManagers = systemManagers;

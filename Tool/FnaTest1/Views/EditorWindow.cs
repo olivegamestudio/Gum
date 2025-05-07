@@ -26,6 +26,7 @@ internal class EditorWindow : FnaControl
     private readonly CanvasBoundsService _canvasBoundsService;
     private readonly RulerService _rulerService;
     private readonly SelectionManager _selectionManager;
+    private readonly WindowsCursorLogic _windowsCursorLogic;
 
     CameraViewModel ViewModel => DataContext as CameraViewModel;
 
@@ -35,7 +36,8 @@ internal class EditorWindow : FnaControl
         EditorGame game,
         CanvasBoundsService canvasBoundsService,
         RulerService rulerService,
-        SelectionManager selectionManager
+        SelectionManager selectionManager,
+        WindowsCursorLogic windowsCursorLogic
         ) : base(game)
     {
         _cameraController = cameraController;
@@ -44,6 +46,7 @@ internal class EditorWindow : FnaControl
         _canvasBoundsService = canvasBoundsService;
         _rulerService = rulerService;
         _selectionManager = selectionManager;
+        _windowsCursorLogic = windowsCursorLogic;
 
         _cameraController.Camera = _game.SystemManagers.Renderer.Camera;
         _game.Updated += HandleEveryFrameUpdate;
@@ -65,10 +68,11 @@ internal class EditorWindow : FnaControl
     {
         try
         {
+            _windowsCursorLogic.StartCursorSettingFrameStart();
             _backgroundSpriteService.Activity();
             _canvasBoundsService.Activity();
             _rulerService.Activity();
-
+            
             if (_rulerService.IsCursorOverRulers == false)
             {
                 var doesTreeViewHaveMouseOver = ElementTreeViewManager.Self.HasMouseOver;
@@ -80,6 +84,8 @@ internal class EditorWindow : FnaControl
 
                 _selectionManager.LateActivity();
             }
+
+            _windowsCursorLogic.EndCursorSettingFrameStart(this);
         }
 
         catch

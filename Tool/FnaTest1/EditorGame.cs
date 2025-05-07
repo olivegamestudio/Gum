@@ -18,8 +18,7 @@ internal class EditorGame : FnaGame
 {
     private readonly CameraController _cameraController;
 
-    // todo - make this use its own instance...
-    public SystemManagers SystemManagers => SystemManagers.Default;
+    public SystemManagers SystemManagers => Gum.SystemManagers;
 
     GumService Gum => GumService.Default;
 
@@ -35,12 +34,12 @@ internal class EditorGame : FnaGame
         FileManager.RelativeDirectory = relativeDirectory;
 
 
-
         base.Initialize();
     }
 
     protected override void Update(GameTime gameTime)
     {
+        
         Gum.Update(gameTime);
 
         var keyboard = Gum.Keyboard;

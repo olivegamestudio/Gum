@@ -5,7 +5,7 @@ using RenderingLibrary;
 using RenderingLibrary.Graphics;
 using RenderingLibrary.Math.Geometry;
 using InputLibrary;
-using WinCursor = System.Windows.Forms.Cursor;
+using WinCursor = System.Windows.Input.Cursor;
 using Sprite = RenderingLibrary.Graphics.Sprite;
 using Camera = RenderingLibrary.Camera;
 using RenderingLibrary.Math;
@@ -16,6 +16,7 @@ using Gum.Managers;
 using Gum.Plugins.InternalPlugins.EditorTab.Services;
 using Gum.Wireframe;
 using MonoGameGum.Input;
+using EditorTabPlugin_FNA.Services;
 
 namespace Gum.Plugins.InternalPlugins.EditorTab.Views
 {
@@ -34,6 +35,7 @@ namespace Gum.Plugins.InternalPlugins.EditorTab.Views
         #region Fields / Properties
         private ToolFontService _toolFontService;
         private ToolLayerService _toolLayerService;
+        private WindowsCursorLogic _windowsCursorLogic;
         //GraphicsDeviceControl mControl;
         SystemManagers mManagers;
         Cursor _cursor;
@@ -244,10 +246,12 @@ namespace Gum.Plugins.InternalPlugins.EditorTab.Views
             Keyboard keyboard,
             ToolFontService toolFontService, 
             ToolLayerService toolLayerService, 
-            LayerService layerService)
+            LayerService layerService,
+            WindowsCursorLogic windowsCursorLogic)
         {
             _toolFontService = toolFontService;
             _toolLayerService = toolLayerService;
+            _windowsCursorLogic = windowsCursorLogic;
 
             //mControl = control;
             mKeyboard = keyboard;
@@ -430,21 +434,20 @@ namespace Gum.Plugins.InternalPlugins.EditorTab.Views
                 WinCursor cursorToSet;
                 if (RulerSide == RulerSide.Left)
                 {
-                    cursorToSet = System.Windows.Forms.Cursors.SizeNS;
+                    cursorToSet = System.Windows.Input.Cursors.SizeNS;
                 }
                 else // top
                 {
-                    cursorToSet = System.Windows.Forms.Cursors.SizeWE;
+                    cursorToSet = System.Windows.Input.Cursors.SizeWE;
                 }
 
-                //mCursor.SetWinformsCursor(cursorToSet);
+                _windowsCursorLogic.SetWinformsCursor(cursorToSet);
             }
 
             // Remove the guide if it is right-clicked
             if (_cursor.IsInWindow && _cursor.SecondaryPush && guideOver != null)
             {
-                mGuides.Remove(guideOver);
-                ShapeManager.Remove(guideOver);
+                RemoveGuide(guideOver);
             }
 
             if (_cursor.IsInWindow && _cursor.PrimaryPush)
@@ -491,10 +494,13 @@ namespace Gum.Plugins.InternalPlugins.EditorTab.Views
 
             if (!_cursor.PrimaryDown)
             {
+                if(mGrabbedGuide != null)
+                {
+                    int m = 3;
+                }
                 if (mGrabbedGuide != null && !isCursorInWindow)
                 {
-                    mGuides.Remove(mGrabbedGuide);
-                    ShapeManager.Remove(mGrabbedGuide);
+                    RemoveGuide(mGrabbedGuide);
                 }
                 nudgeXOffset = 0;
                 nudgeYOffset = 0;
@@ -502,6 +508,12 @@ namespace Gum.Plugins.InternalPlugins.EditorTab.Views
             }
 
             return guideOver != null || mGrabbedGuide != null;
+        }
+
+        private void RemoveGuide(Line guide)
+        {
+            mGuides.Remove(guide);
+            ShapeManager.Remove(guide);
         }
 
         private void UpdateDistanceArrows(Color guideLineColor, Color guideTextColor)

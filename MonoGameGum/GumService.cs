@@ -49,7 +49,9 @@ public class GumService
 
     public GamePad[] Gamepads => FormsUtilities.Gamepads;
 
-    public Renderer Renderer => SystemManagers.Default.Renderer;
+    public Renderer Renderer => this.SystemManagers.Renderer;
+
+    public SystemManagers SystemManagers { get; private set; }
 
     public float CanvasWidth
     {
@@ -144,11 +146,14 @@ public class GumService
 
         _game = game;
         RegisterRuntimeTypesThroughReflection();
-        SystemManagers.Default = new SystemManagers();
+
+        this.SystemManagers = new SystemManagers();
+
+        SystemManagers.Default = this.SystemManagers;
 #if NET6_0_OR_GREATER
-        ISystemManagers.Default = SystemManagers.Default;
+        ISystemManagers.Default = this.SystemManagers;
 #endif
-        SystemManagers.Default.Initialize(graphicsDevice, fullInstantiation: true);
+        this.SystemManagers.Initialize(graphicsDevice, fullInstantiation: true);
         FormsUtilities.InitializeDefaults();
 
         Root.Width = 0;
@@ -158,7 +163,7 @@ public class GumService
         Root.Name = "Main Root";
         Root.HasEvents = false;
 
-        Root.AddToManagers(SystemManagers.Default);
+        Root.AddToManagers(this.SystemManagers);
 
         GumProjectSave? gumProject = null;
 
@@ -243,7 +248,7 @@ public class GumService
     {
         GameTime = gameTime;
         FormsUtilities.Update(game, gameTime, root);
-        SystemManagers.Default.Activity(gameTime.TotalGameTime.TotalSeconds);
+        this.SystemManagers.Activity(gameTime.TotalGameTime.TotalSeconds);
         root.AnimateSelf(gameTime.ElapsedGameTime.TotalSeconds);
     }
 
@@ -251,7 +256,7 @@ public class GumService
     {
         GameTime = gameTime;
         FormsUtilities.Update(game, gameTime, roots);
-        SystemManagers.Default.Activity(gameTime.TotalGameTime.TotalSeconds);
+        this.SystemManagers.Activity(gameTime.TotalGameTime.TotalSeconds);
         foreach(var item in roots)
         {
             item.AnimateSelf(gameTime.ElapsedGameTime.TotalSeconds);
@@ -264,7 +269,7 @@ public class GumService
 
     public void Draw()
     {
-        SystemManagers.Default.Draw();
+        this.SystemManagers.Draw();
     }
 
     #endregion
@@ -290,9 +295,9 @@ public static class GraphicalUiElementExtensionMethods
 
 public static class ElementSaveExtensionMethods
 {
-    public static GraphicalUiElement ToGraphicalUiElement(this ElementSave elementSave)
+    public static GraphicalUiElement ToGraphicalUiElement(this ElementSave elementSave, SystemManagers? systemManagers = null)
     {
-        return elementSave.ToGraphicalUiElement(SystemManagers.Default, addToManagers: false);
+        return elementSave.ToGraphicalUiElement(systemManagers ?? SystemManagers.Default, addToManagers: false);
     }
 }
 

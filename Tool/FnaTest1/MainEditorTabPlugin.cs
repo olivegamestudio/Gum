@@ -102,6 +102,7 @@ internal class MainEditorTabPlugin : PluginBase
     private readonly RulerService _rulerService;
     private Cursor _cursor;
     private Keyboard _keyboard;
+    private readonly WindowsCursorLogic _windowsCursorLogic;
 
     private EditingManager _editingManager;
 
@@ -109,13 +110,16 @@ internal class MainEditorTabPlugin : PluginBase
 
     public MainEditorTabPlugin()
     {
+        _windowsCursorLogic = new WindowsCursorLogic();
         _scrollbarService = new ScrollbarService();
         _guiCommands = Gum.Services.Builder.Get<GuiCommands>();
         _localizationManager = Gum.Services.Builder.Get<LocalizationManager>();
         _editingManager = new EditingManager();
-        _selectionManager = new SelectionManager(SelectedState.Self,
+        _selectionManager = new SelectionManager(
+            SelectedState.Self,
             _editingManager,
-            GumCommands.Self.GuiCommands);
+            GumCommands.Self.GuiCommands,
+            _windowsCursorLogic);
         _screenshotService = new ScreenshotService(_selectionManager);
         _elementCommands = ElementCommands.Self;
         _singlePixelTextureService = new SinglePixelTextureService();
@@ -163,7 +167,8 @@ internal class MainEditorTabPlugin : PluginBase
                 _cursor,
                 _keyboard,
                 _toolFontService,
-                _toolLayerService);
+                _toolLayerService,
+                _windowsCursorLogic);
 
             _selectionManager.Initialize(_layerService,
                 _toolFontService,
@@ -179,7 +184,8 @@ internal class MainEditorTabPlugin : PluginBase
             game,
             _canvasBoundsService,
             _rulerService,
-            _selectionManager);
+            _selectionManager,
+            _windowsCursorLogic);
 
         _cameraViewModel = new CameraViewModel(game.SystemManagers.Renderer.Camera);
         fnaControl.DataContext = _cameraViewModel;

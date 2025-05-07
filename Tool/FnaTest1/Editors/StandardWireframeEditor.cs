@@ -739,29 +739,29 @@ namespace Gum.Wireframe.Editors
             }
         }
 
-        public override System.Windows.Forms.Cursor GetWindowsCursorToShow(
-            System.Windows.Forms.Cursor defaultCursor, float worldXAt, float worldYAt)
+        public override System.Windows.Input.Cursor GetWindowsCursorToShow(
+            System.Windows.Input.Cursor defaultCursor, float worldXAt, float worldYAt)
         {
-            System.Windows.Forms.Cursor cursorToSet = defaultCursor;
+            System.Windows.Input.Cursor cursorToSet = defaultCursor;
 
 
             switch (SideOver)
             {
                 case ResizeSide.TopLeft:
                 case ResizeSide.BottomRight:
-                    cursorToSet = System.Windows.Forms.Cursors.SizeNWSE;
+                    cursorToSet = System.Windows.Input.Cursors.SizeNWSE;
                     break;
                 case ResizeSide.TopRight:
                 case ResizeSide.BottomLeft:
-                    cursorToSet = System.Windows.Forms.Cursors.SizeNESW;
+                    cursorToSet = System.Windows.Input.Cursors.SizeNESW;
                     break;
                 case ResizeSide.Top:
                 case ResizeSide.Bottom:
-                    cursorToSet = System.Windows.Forms.Cursors.SizeNS;
+                    cursorToSet = System.Windows.Input.Cursors.SizeNS;
                     break;
                 case ResizeSide.Left:
                 case ResizeSide.Right:
-                    cursorToSet = System.Windows.Forms.Cursors.SizeWE;
+                    cursorToSet = System.Windows.Input.Cursors.SizeWE;
                     break;
                 case ResizeSide.None:
 

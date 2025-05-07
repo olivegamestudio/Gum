@@ -537,19 +537,19 @@ namespace Gum.Wireframe.Editors
 
         #region Get/Find methods
 
-        public override System.Windows.Forms.Cursor GetWindowsCursorToShow(System.Windows.Forms.Cursor defaultCursor, float worldXAt, float worldYAt)
+        public override System.Windows.Input.Cursor GetWindowsCursorToShow(System.Windows.Input.Cursor defaultCursor, float worldXAt, float worldYAt)
         {
             var pointOver = GetIndexOver(worldXAt, worldYAt);
 
             if (pointOver != null)
             {
                 // Do we want different cursors here?
-                return System.Windows.Forms.Cursors.SizeAll;
+                return System.Windows.Input.Cursors.SizeAll;
             }
             else if (HasCursorOver)
             {
                 // for now just return the move cursor, eventually do the 
-                return System.Windows.Forms.Cursors.SizeAll;
+                return System.Windows.Input.Cursors.SizeAll;
             }
             return defaultCursor;
         }

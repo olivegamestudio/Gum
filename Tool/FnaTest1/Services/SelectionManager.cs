@@ -19,6 +19,7 @@ using InputLibrary;
 using MonoGameGum;
 using Gum.Managers;
 using Gum.Commands;
+using EditorTabPlugin_FNA.Services;
 
 namespace Gum.Wireframe;
 
@@ -49,7 +50,11 @@ public class SelectionManager
     LayerService _layerService;
     private ToolFontService _toolFontService;
     private SystemManagers _systemManagers;
+    private WindowsCursorLogic _windowsCursorLogic;
     public WireframeEditor WireframeEditor;
+    ISelectedState _selectedState;
+    private readonly EditingManager _editingManager;
+    private readonly GuiCommands _guiCommands;
 
     List<GraphicalUiElement> mSelectedIpsos = new List<GraphicalUiElement>();
     IPositionedSizedObject mHighlightedIpso;
@@ -70,9 +75,6 @@ public class SelectionManager
     }
 
 
-    ISelectedState _selectedState;
-    private readonly EditingManager _editingManager;
-    private readonly GuiCommands _guiCommands;
 
     public bool IsOverBody
     {
@@ -185,11 +187,13 @@ public class SelectionManager
 
     internal SelectionManager(ISelectedState selectedState, 
         EditingManager editingManager,
-        GuiCommands guiCommands)
+        GuiCommands guiCommands,
+        WindowsCursorLogic windowsCursorLogic)
     {
         _selectedState = selectedState;
         _editingManager = editingManager;
         _guiCommands = guiCommands;
+        _windowsCursorLogic = windowsCursorLogic;
     }
 
     public void Initialize(LayerService layerService, 
@@ -277,7 +281,7 @@ public class SelectionManager
             // wireframe window and the cursor will
             // change.
 
-            Cursor cursorToSet = Cursors.Arrow;
+            System.Windows.Input.Cursor cursorToSet = System.Windows.Input.Cursors.Arrow;
 
             float worldXAt = Cursor.GetWorldX(SystemManagers.Default);
             float worldYAt = Cursor.GetWorldY(SystemManagers.Default);
@@ -314,7 +318,7 @@ public class SelectionManager
                     {
                         if (IsOverBody && Cursor.PrimaryDown)
                         {
-                            cursorToSet = Cursors.SizeAll;
+                            cursorToSet = System.Windows.Input.Cursors.SizeAll;
                             representationOver = WireframeObjectManager.Self.GetSelectedRepresentation();
                         }
                         else
@@ -327,7 +331,7 @@ public class SelectionManager
 
                             if (representationOver != null)
                             {
-                                cursorToSet = Cursors.SizeAll;
+                                cursorToSet = System.Windows.Input.Cursors.SizeAll;
                                 IsOverBody = true;
                             }
                             else
@@ -354,7 +358,7 @@ public class SelectionManager
             // We used to not check this, but we have to now because the cursor might be 
             if(Cursor.IsInWindow)
             {
-                //Cursor.SetWinformsCursor(cursorToSet);
+                _windowsCursorLogic.SetWinformsCursor(cursorToSet);
 
                 // We don't want to show the highlight when the user is performing some kind of editing.
                 // Therefore make sure the cursor isn't down.

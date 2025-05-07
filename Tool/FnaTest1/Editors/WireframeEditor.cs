@@ -71,8 +71,8 @@ public abstract class WireframeEditor
 
     public abstract void Activity(ICollection<GraphicalUiElement> selectedObjects);
 
-    public abstract System.Windows.Forms.Cursor GetWindowsCursorToShow(
-        System.Windows.Forms.Cursor defaultCursor, float worldXAt, float worldYAt);
+    public abstract System.Windows.Input.Cursor GetWindowsCursorToShow(
+        System.Windows.Input.Cursor defaultCursor, float worldXAt, float worldYAt);
 
     public abstract void Destroy();
 
