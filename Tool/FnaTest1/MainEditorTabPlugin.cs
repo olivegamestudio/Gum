@@ -151,7 +151,7 @@ internal class MainEditorTabPlugin : PluginBase
         // get called
         game.Initialized += () =>
         {
-            _cursor = new Cursor();
+            _cursor = GumService.Default.Cursor;
             _keyboard = new Keyboard();
 
             _layerService.Initialize();

@@ -368,7 +368,7 @@ public class SelectionManager
                 }
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine($"2");
+                    System.Diagnostics.Debug.WriteLine($"2 with cursor {Cursor.X}");
                     HighlightedIpso = null;
                 }
             }

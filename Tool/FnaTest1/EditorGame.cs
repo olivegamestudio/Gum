@@ -46,6 +46,9 @@ internal class EditorGame : FnaGame
         var keyboard = Gum.Keyboard;
         var cursor = Gum.Cursor;
 
+        System.Diagnostics.Debug.WriteLine(ForcedMouseState);
+
+        cursor.Activity(gameTime.TotalGameTime.TotalSeconds, ForcedMouseState);
         //_cameraController.Update();
 
 

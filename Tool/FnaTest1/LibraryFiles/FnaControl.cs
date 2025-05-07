@@ -3,6 +3,7 @@
 
 using EditorTabPlugin_FNA.LibraryFiles;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using SDL3;
 using System;
 using System.Diagnostics;
@@ -43,6 +44,10 @@ namespace WPFNA
         #region Mouse Vars
         public Microsoft.Xna.Framework.Point MousePosition { get; private set; }
         public System.Windows.Point MousePositionScreen { get; private set; }
+        ButtonState LeftMouseButton;
+        ButtonState RightMouseButton;
+        ButtonState MiddleMouseButton;
+
         public bool IsMouseInside { get; private set; }
         public bool WasMouseInside {  get; private set; }
         private Rect windowRect;
@@ -117,6 +122,15 @@ namespace WPFNA
 
             while (Game != null && !shutdownToken.IsCancellationRequested)
             {
+                Game.ForcedMouseState = new Microsoft.Xna.Framework.Input.MouseState(
+                    (int)MousePosition.X, (int)MousePosition.Y, 0,
+                    LeftMouseButton,
+                    MiddleMouseButton,
+                    RightMouseButton,
+                    ButtonState.Released,
+                    ButtonState.Released
+                    );
+
                 Game?.RunOneFrame();
                 UpdateMouseLocation();
                 UpdateDragDrop();
@@ -238,6 +252,7 @@ namespace WPFNA
             WM wm = (WM)wParam.ToInt32();
             if (wm == WM.LBUTTONUP)
             {
+                LeftMouseButton = ButtonState.Released;
                 MSLLHOOKSTRUCT msll = (MSLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(MSLLHOOKSTRUCT));
                 MousePositionScreen = new System.Windows.Point(msll.pt.X, msll.pt.Y);
 
@@ -252,6 +267,7 @@ namespace WPFNA
             }
             else if(wm == WM.MBUTTONUP)
             {
+                MiddleMouseButton = ButtonState.Released;
                 MSLLHOOKSTRUCT msll = (MSLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(MSLLHOOKSTRUCT));
                 MousePositionScreen = new System.Windows.Point(msll.pt.X, msll.pt.Y);
 
@@ -294,6 +310,7 @@ namespace WPFNA
                         MouseMoveFNA(isMiddleMouseDown, lastMousePosition);
                     break;
                 case WM.LBUTTONDOWN: //left mouse down
+                    LeftMouseButton = ButtonState.Pressed;
                     this.Focus();
                     handled = true;
 
@@ -301,6 +318,7 @@ namespace WPFNA
                         MouseDownFNA(MouseButton.Left, lastMousePosition);
                     break;
                 case WM.LBUTTONUP: //left mouse up
+                    LeftMouseButton = ButtonState.Released;
                     handled = true;
 
                     if (MouseUpFNA != null)
@@ -311,12 +329,14 @@ namespace WPFNA
                 //    // this.Focus();
                 //    break;
                 case WM.RBUTTONDOWN: //right mouse down
+                    RightMouseButton = ButtonState.Pressed;
                     handled = true;
 
                     if (MouseDownFNA != null)
                         MouseDownFNA(MouseButton.Right, lastMousePosition);
                     break;
                 case WM.RBUTTONUP: //right mouse up
+                    RightMouseButton = ButtonState.Released;
                     handled = true;
 
                     if (MouseUpFNA != null)
@@ -326,12 +346,14 @@ namespace WPFNA
                 //    handled = true;
                 //    break;
                 case WM.MBUTTONDOWN: //middle mouse down
+                    MiddleMouseButton = ButtonState.Pressed;
                     handled = true;
                     isMiddleMouseDown = true;
                     if (MouseDownFNA != null)
                         MouseDownFNA(MouseButton.Middle, lastMousePosition);
                     break;
                 case WM.MBUTTONUP: //middle mouse up
+                    MiddleMouseButton = ButtonState.Released;
                     handled = true;
                     isMiddleMouseDown = false;
 

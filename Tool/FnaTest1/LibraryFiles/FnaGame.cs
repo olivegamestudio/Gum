@@ -1,6 +1,7 @@
 ﻿using Gum.Plugins.InternalPlugins.EditorTab.Services;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using MonoGameGum;
 using MonoGameGum.GueDeriving;
 using System;
@@ -17,6 +18,8 @@ public class FnaGame : Game
 {
     private GraphicsDeviceManager graphics;
     private SpriteBatch sb;
+
+    public MouseState ForcedMouseState { get; set; }
 
     private Point Resolution = new Point(800, 500);
     private bool doResize;
