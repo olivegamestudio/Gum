@@ -270,7 +270,7 @@ public class Keyboard : IInputReceiverKeyboardMonoGame
     }
 
 
-    public void Activity(double currentTime, Game? game = null)
+    public void Activity(double currentTime, Game? game = null, KeyboardState? forcedKeyboardState = null)
     {
 #if ANDROID
 			ProcessAndroidKeys();
@@ -298,7 +298,7 @@ public class Keyboard : IInputReceiverKeyboardMonoGame
             }
         }
 
-        keyboardStateProcessor.Update();
+        keyboardStateProcessor.Update(forcedKeyboardState);
 
         for (int i = 0; i < NumberOfKeys; i++)
         {
@@ -539,10 +539,10 @@ public class KeyboardStateProcessor
             !mKeyboardState.IsKeyDown(key);
     }
 
-    public void Update()
+    public void Update(KeyboardState? forcedKeyboardState)
     {
         mLastFrameKeyboardState = mKeyboardState;
-        mKeyboardState = Microsoft.Xna.Framework.Input.Keyboard.GetState();
+        mKeyboardState = forcedKeyboardState ?? Microsoft.Xna.Framework.Input.Keyboard.GetState();
     }
 
 }

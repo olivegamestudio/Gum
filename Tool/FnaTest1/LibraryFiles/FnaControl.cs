@@ -2,15 +2,19 @@
 //Use at your own risk. No warranty expressed or implied!
 
 using EditorTabPlugin_FNA.LibraryFiles;
+using Gum.Managers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using SDL3;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -48,6 +52,11 @@ namespace WPFNA
         ButtonState RightMouseButton;
         ButtonState MiddleMouseButton;
 
+        HashSet<Microsoft.Xna.Framework.Input.Keys> Keys =
+            new HashSet<Keys>();
+
+        Keys[] KeysArray = new Keys[0];
+
         public bool IsMouseInside { get; private set; }
         public bool WasMouseInside {  get; private set; }
         private Rect windowRect;
@@ -64,8 +73,56 @@ namespace WPFNA
             bool ret = (bool)SDL.SDL_Init(SDL.SDL_InitFlags.SDL_INIT_VIDEO);
             Debug.WriteLine($"SDL_Init {ret}");
 
-            //create game and initialize
-            Game = fnaGame;
+            KeyDown += (s, e) =>
+            {
+                var wpfKey = e.Key;
+
+                var xnaKey = (Keys)System.Windows.Input.KeyInterop.VirtualKeyFromKey(wpfKey);
+
+                var winformsKey = (System.Windows.Forms.Keys)xnaKey;
+                if (Keys.Contains(Microsoft.Xna.Framework.Input.Keys.LeftShift) || Keys.Contains(Microsoft.Xna.Framework.Input.Keys.RightShift))
+                {
+                    winformsKey = winformsKey | System.Windows.Forms.Keys.Shift;
+                }
+                if(Keys.Contains(Microsoft.Xna.Framework.Input.Keys.LeftAlt) || Keys.Contains(Microsoft.Xna.Framework.Input.Keys.RightAlt))
+                {
+                    winformsKey = winformsKey | System.Windows.Forms.Keys.Alt;
+                }
+                if(Keys.Contains(Microsoft.Xna.Framework.Input.Keys.LeftControl) || Keys.Contains(Microsoft.Xna.Framework.Input.Keys.RightControl))
+                {
+                    winformsKey = winformsKey | System.Windows.Forms.Keys.Control;
+                }
+
+                var msg = new System.Windows.Forms.Message();
+                bool handled = HotkeyManager.Self.ProcessCmdKeyWireframe(ref msg, winformsKey);
+
+                if (Keys.Add(xnaKey))
+                {
+                    KeysArray = Keys.ToArray();
+                    ShowKeys();
+                }
+                e.Handled = true;
+
+            };
+            KeyUp += (s, e) =>
+            {
+                var wpfKey = e.Key;
+                var xnaKey = (Keys)System.Windows.Input.KeyInterop.VirtualKeyFromKey(wpfKey);
+                Keys.Remove(xnaKey);
+                KeysArray = Keys.ToArray();
+                ShowKeys();
+                e.Handled = true;
+
+            };
+
+            void ShowKeys()
+            {
+                KeysArray = Keys.ToArray();
+                Debug.WriteLine($"Key: {string.Join(",", KeysArray)}");
+            }
+
+                //create game and initialize
+                Game = fnaGame;
             Game.RunOneFrame();
 
             //spin up game update thread
@@ -130,6 +187,8 @@ namespace WPFNA
                     ButtonState.Released,
                     ButtonState.Released
                     );
+                var keyboardState = new Microsoft.Xna.Framework.Input.KeyboardState(KeysArray);
+                Game.ForcedKeyboardState = keyboardState;
 
                 Game?.RunOneFrame();
                 UpdateMouseLocation();

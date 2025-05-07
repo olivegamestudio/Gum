@@ -20,6 +20,7 @@ public class FnaGame : Game
     private SpriteBatch sb;
 
     public MouseState ForcedMouseState { get; set; }
+    public KeyboardState ForcedKeyboardState { get; set; }
 
     private Point Resolution = new Point(800, 500);
     private bool doResize;

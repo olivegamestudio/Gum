@@ -360,15 +360,12 @@ public class SelectionManager
                 // Therefore make sure the cursor isn't down.
                 if (representationOver != null && Cursor.PrimaryDown == false)
                 {
-                    System.Diagnostics.Debug.WriteLine($"1");
-
                     HighlightedIpso = representationOver;
 
                     mGraphicalOutline.UpdateHighlightElements();
                 }
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine($"2 with cursor {Cursor.X}");
                     HighlightedIpso = null;
                 }
             }
@@ -376,13 +373,11 @@ public class SelectionManager
         else if(GumService.Default.Cursor.PrimaryDown && Cursor.IsInWindow)
         {
             // We only want to hide it if the user is holding the cursor down over the wireframe window.
-                    System.Diagnostics.Debug.WriteLine($"3");
             HighlightedIpso = null;
         }
 
         if (forceNoHighlight)
         {
-                    System.Diagnostics.Debug.WriteLine($"4");
             HighlightedIpso = null;
         }
         
