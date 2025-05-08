@@ -215,6 +215,11 @@ internal class MainEditorTabPlugin : PluginBase
             handled = _cameraController.HandleKeyPress(args);
         }
 
+        if(!handled)
+        {
+            HotkeyManager.Self.HandleKeyDownWireframe(args);
+        }
+
         args.Handled = handled;
     }
 

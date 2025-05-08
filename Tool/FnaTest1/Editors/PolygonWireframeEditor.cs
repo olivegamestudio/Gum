@@ -466,7 +466,6 @@ namespace Gum.Wireframe.Editors
 
         private void BodyGrabbingActivity()
         {
-            System.Diagnostics.Debug.WriteLine("Grabbed Index" + grabbedIndex);
             var cursor = GumService.Default.Cursor;
             if (cursor.PrimaryDown && hasGrabbedBodyOrPoint &&
                 grabbedState.HasMovedEnough && grabbedIndex == null)

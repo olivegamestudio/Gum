@@ -80,8 +80,7 @@ public class FnaControl : HwndHost
 
         KeyDown += (s, e) =>
         {
-            var wpfKey = e.Key;
-
+            var wpfKey = e.SystemKey != Key.None ? e.SystemKey : e.Key;
             var xnaKey = (Keys)System.Windows.Input.KeyInterop.VirtualKeyFromKey(wpfKey);
 
             var winformsKey = (System.Windows.Forms.Keys)xnaKey;
@@ -231,12 +230,12 @@ public class FnaControl : HwndHost
 
             var afterSleep = stopWatch.Elapsed.TotalSeconds;
 
-            if(stopWatch.Elapsed.TotalSeconds > lastPrint + 1)
-            {
-                lastPrint = stopWatch.Elapsed.TotalSeconds;
-                System.Diagnostics.Debug.WriteLine($"Game Logic: {((afterRunOneFrame - start) * 1000):0.00}, " +
-                    $"Slept for: {msToSleep:0.00}, Total loop: {((afterSleep - start)*1000):0.00})");
-            }
+            //if(stopWatch.Elapsed.TotalSeconds > lastPrint + 1)
+            //{
+            //    lastPrint = stopWatch.Elapsed.TotalSeconds;
+            //    System.Diagnostics.Debug.WriteLine($"Game Logic: {((afterRunOneFrame - start) * 1000):0.00}, " +
+            //        $"Slept for: {msToSleep:0.00}, Total loop: {((afterSleep - start)*1000):0.00})");
+            //}
         }
 
         Debug.WriteLine("Game stopped");
