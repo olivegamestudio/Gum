@@ -43,6 +43,11 @@ public class FnaControl : HwndHost
     public event Action MouseEnterFNA;
     public event Action MouseLeaveFNA;
     public event Action<object, Microsoft.Xna.Framework.Point> DropFNA;
+
+    public event Action<object, System.Windows.Forms.KeyEventArgs> KeyDownWinforms;
+
+
+
     #endregion
 
     #region Mouse Vars
@@ -93,8 +98,10 @@ public class FnaControl : HwndHost
                 winformsKey = winformsKey | System.Windows.Forms.Keys.Control;
             }
 
-            var msg = new System.Windows.Forms.Message();
-            bool handled = HotkeyManager.Self.ProcessCmdKeyWireframe(ref msg, winformsKey);
+            var args = new System.Windows.Forms.KeyEventArgs(winformsKey);
+            KeyDownWinforms?.Invoke(this, args);
+
+            bool handled = args.Handled;
 
             if (Keys.Add(xnaKey))
             {

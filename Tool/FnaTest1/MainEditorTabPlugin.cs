@@ -124,7 +124,9 @@ internal class MainEditorTabPlugin : PluginBase
         _elementCommands = ElementCommands.Self;
         _singlePixelTextureService = new SinglePixelTextureService();
         var hotkeyManager = Gum.Services.Builder.Get<HotkeyManager>();
-        _cameraController = new CameraController(hotkeyManager);
+        _cameraController = new CameraController(
+            hotkeyManager
+            );
         _backgroundSpriteService = new BackgroundSpriteService();
         _canvasBoundsService = new CanvasBoundsService();
         _layerService = new LayerService();
@@ -175,7 +177,6 @@ internal class MainEditorTabPlugin : PluginBase
                 game.SystemManagers, 
                 _cursor);
 
-
         };
 
         var fnaControl = new EditorWindow(
@@ -188,6 +189,9 @@ internal class MainEditorTabPlugin : PluginBase
             _windowsCursorLogic);
 
         _cameraViewModel = new CameraViewModel(game.SystemManagers.Renderer.Camera);
+        _cameraController.Initialize(_cameraViewModel);
+        fnaControl.KeyDownWinforms += HandleKeyDownWinforms;
+
         fnaControl.DataContext = _cameraViewModel;
 
         //fnaControl.KeyDown += OnKeyDown;
@@ -199,6 +203,19 @@ internal class MainEditorTabPlugin : PluginBase
         HandleXnaInitialized();
 
         //var tab = GumCommands.Self.GuiCommands.AddControl(fnaControl, "Fna Test");
+    }
+
+    private void HandleKeyDownWinforms(object arg1, System.Windows.Forms.KeyEventArgs args)
+    {
+        var msg = new System.Windows.Forms.Message();
+        bool handled = HotkeyManager.Self.ProcessCmdKeyWireframe(ref msg, args.KeyData);
+
+        if(!handled)
+        {
+            handled = _cameraController.HandleKeyPress(args);
+        }
+
+        args.Handled = handled;
     }
 
     //void OnKeyDown(object sender, KeyEventArgs e)

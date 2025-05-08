@@ -624,31 +624,55 @@ public class SelectionManager
         }
         else if(SelectedGues.Count > 0 && SelectedGue?.Tag is ScreenSave == false)
         {
-            if(WireframeEditor is StandardWireframeEditor == false)
+            var tag = SelectedGue.Tag as ElementSave;
+
+            var isPolygon = false;
+            if (ObjectFinder.Self.GetRootStandardElementSave(tag)?.Name == "Polygon")
             {
-                if(WireframeEditor != null)
+                isPolygon = true;
+            }
+
+            if (isPolygon)
+            {
+                if (WireframeEditor != null)
                 {
                     WireframeEditor.Destroy();
                 }
-
-                var lineColor = Color.FromArgb(255, GumState.Self.ProjectState.GeneralSettings.GuideLineColorR,
-                    GumState.Self.ProjectState.GeneralSettings.GuideLineColorG,
-                    GumState.Self.ProjectState.GeneralSettings.GuideLineColorB);
-
-                var textColor = Color.FromArgb(255, GumState.Self.ProjectState.GeneralSettings.GuideTextColorR,
-                    GumState.Self.ProjectState.GeneralSettings.GuideTextColorG,
-                    GumState.Self.ProjectState.GeneralSettings.GuideTextColorB);
-
-                WireframeEditor = new StandardWireframeEditor(
-                    _layerService.OverlayLayer, 
-                    lineColor, 
-                    textColor, 
+                WireframeEditor = new PolygonWireframeEditor(
+                    _layerService.OverlayLayer,
                     global::Gum.Managers.HotkeyManager.Self,
-                    this,
-                    _toolFontService,
-                    _guiCommands,
-                    _systemManagers);
+                    this);
             }
+            else
+            {
+                if (WireframeEditor is StandardWireframeEditor == false)
+                {
+                    if(WireframeEditor != null)
+                    {
+                        WireframeEditor.Destroy();
+                    }
+
+                    var lineColor = Color.FromArgb(255, GumState.Self.ProjectState.GeneralSettings.GuideLineColorR,
+                        GumState.Self.ProjectState.GeneralSettings.GuideLineColorG,
+                        GumState.Self.ProjectState.GeneralSettings.GuideLineColorB);
+
+                    var textColor = Color.FromArgb(255, GumState.Self.ProjectState.GeneralSettings.GuideTextColorR,
+                        GumState.Self.ProjectState.GeneralSettings.GuideTextColorG,
+                        GumState.Self.ProjectState.GeneralSettings.GuideTextColorB);
+
+                    WireframeEditor = new StandardWireframeEditor(
+                        _layerService.OverlayLayer, 
+                        lineColor, 
+                        textColor, 
+                        global::Gum.Managers.HotkeyManager.Self,
+                        this,
+                        _toolFontService,
+                        _guiCommands,
+                        _systemManagers);
+                }
+            }
+
+
         }
         else if(WireframeEditor != null)
         {

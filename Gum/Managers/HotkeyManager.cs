@@ -360,6 +360,7 @@ public class HotkeyManager : Singleton<HotkeyManager>
 
     void HandleCopyCutPaste(KeyEventArgs e)
     {
+
         if(Copy.IsPressed(e))
         {
             _copyPasteLogic.OnCopy(CopyType.InstanceOrElement);
@@ -398,6 +399,21 @@ public class HotkeyManager : Singleton<HotkeyManager>
         HandleGoToDefinition(e);
 
     }
+
+    //public void HandleKeyDownWireframe(System.Windows.Input.KeyEventArgs e)
+    //{
+    //    HandleCopyCutPaste(e);
+
+    //    HandleDelete(e);
+    //    // Up moves the control "up" in the tree view, but when you are in the wireframe
+    //    // up should move it the opposite direction. We'll see how it goes...
+    //    // Update - inverting is not a good idea because it will work differently when
+    //    // dealing with stack layouts, and that's more complexity than I want to handle
+    //    HandleReorder(e);
+
+    //    HandleGoToDefinition(e);
+
+    //}
 
     public bool ProcessCmdKeyWireframe(ref Message msg, Keys keyData)
     {

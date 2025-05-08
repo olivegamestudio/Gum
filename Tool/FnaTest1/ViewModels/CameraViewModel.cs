@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace EditorTabPlugin_FNA.ViewModels;
-internal class CameraViewModel : ViewModel
+public class CameraViewModel : ViewModel
 {
     List<int> _availableZoomLevels = new List<int>();
     Camera _camera;
