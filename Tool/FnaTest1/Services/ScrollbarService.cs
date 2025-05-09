@@ -15,6 +15,11 @@ public class ScrollbarService
 {
     ScrollBarControlLogic scrollBarControlLogic;
 
+    public ScrollbarService(ScrollBarControlLogic scrollBarControlLogic)
+    {
+        this.scrollBarControlLogic = scrollBarControlLogic;
+    }
+
     public void HandleElementSelected(ElementSave obj)
     {
 

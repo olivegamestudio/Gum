@@ -1,6 +1,10 @@
 ﻿using RenderingLibrary;
 using System;
-using System.Windows.Forms;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+//using System.Windows;
+//using System.Windows.Forms;
 
 namespace Gum.Wireframe
 {
@@ -19,8 +23,8 @@ namespace Gum.Wireframe
 
         float zoomPercentage = 100;
 
-        Panel mPanel;
-        Control xnaControl;
+        System.Windows.Controls.Panel mParent;
+        FrameworkElement xnaControl;
 
         #endregion
 
@@ -57,27 +61,41 @@ namespace Gum.Wireframe
 
         #endregion
 
-        public ScrollBarControlLogic(Panel panel, Control xnaControl)
+        public ScrollBarControlLogic()
         {
-            mPanel = panel;
+
+
+
+        }
+
+        public void Initialize(System.Windows.Controls.Panel parent, FrameworkElement xnaControl, SystemManagers managers)
+        {
+            mParent = parent;
             this.xnaControl = xnaControl;
 
-            mVerticalScrollBar = new VScrollBar();
-            mVerticalScrollBar.Dock = DockStyle.Right;
+            mVerticalScrollBar = new();
+            mVerticalScrollBar.Orientation = System.Windows.Controls.Orientation.Vertical;
+            //mVerticalScrollBar.Dock = DockStyle.Right;
             //mVerticalScrollBar.Scroll += HandleVerticalScroll;
             mVerticalScrollBar.ValueChanged += HandleVerticalScroll;
-            panel.Controls.Add(mVerticalScrollBar);
+            Grid.SetRow(mVerticalScrollBar, 0);
+            Grid.SetColumn(mVerticalScrollBar, 1);
 
-            mHorizontalScrollBar = new HScrollBar();
-            mHorizontalScrollBar.Dock = DockStyle.Bottom;
+            parent.Children.Add(mVerticalScrollBar);
+
+            mHorizontalScrollBar = new ScrollBar();
+            //mHorizontalScrollBar.Dock = DockStyle.Bottom;
 
             mHorizontalScrollBar.ValueChanged += HandleHorizontalScroll;
-            panel.Controls.Add(mHorizontalScrollBar);
+            mHorizontalScrollBar.Orientation = Orientation.Horizontal;
+            Grid.SetRow(mHorizontalScrollBar, 1);
+            Grid.SetColumn(mHorizontalScrollBar, 0);
+            parent.Children.Add(mHorizontalScrollBar);
 
             SetDisplayedArea(2048, 2048);
 
-            xnaControl.Resize += HandlePanelResize;
-
+            //xnaControl.Resize += HandlePanelResize;
+            this.managers = managers;
         }
         
         void HandlePanelResize(object sender, EventArgs e)
@@ -87,12 +105,12 @@ namespace Gum.Wireframe
         
         private void HandleVerticalScroll(object sender, EventArgs e)
         {
-            Managers.Renderer.Camera.Y = mVerticalScrollBar.Value;
+            Managers.Renderer.Camera.Y = (float)mVerticalScrollBar.Value;
         }
 
         private void HandleHorizontalScroll(object sender, EventArgs e)
         {
-            Managers.Renderer.Camera.X = mHorizontalScrollBar.Value;
+            Managers.Renderer.Camera.X = (float)mHorizontalScrollBar.Value;
 
         }
 
@@ -146,12 +164,13 @@ namespace Gum.Wireframe
 
                 var effectiveAreaHeight = -minimumY + displayedAreaHeight;
 
-                var visibleAreaHeight = xnaControl.Height / camera.Zoom;
+                var visibleAreaHeight = xnaControl.ActualHeight / camera.Zoom;
                 mVerticalScrollBar.Minimum = minimumY;
                 mVerticalScrollBar.Maximum = (int)(effectiveAreaHeight + visibleAreaHeight);
                 mVerticalScrollBar.LargeChange = (int)visibleAreaHeight;
+                mVerticalScrollBar.ViewportSize = (int)visibleAreaHeight;
 
-                var visibleAreaWidth = xnaControl.Width / camera.Zoom;
+                var visibleAreaWidth = xnaControl.ActualWidth / camera.Zoom;
 
                 var effectiveAreaWidth = -minimumX + displayedAreaWidth;
 
@@ -161,6 +180,7 @@ namespace Gum.Wireframe
                 // are at the middle, meaning we can see half a screen width on either side 
                 mHorizontalScrollBar.Maximum = (int)(effectiveAreaWidth + visibleAreaWidth);
                 mHorizontalScrollBar.LargeChange = (int)visibleAreaWidth; // the amount of visible area. It's called LargeChange but it really means how much the scrollbar can see 
+                mHorizontalScrollBar.ViewportSize = (int)visibleAreaWidth;
             }
         }
 

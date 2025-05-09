@@ -211,6 +211,7 @@ namespace RenderingLibrary
             }
             else
             {
+
                 return Matrix.CreateTranslation(-x, -y, 0) *
                                          Matrix.CreateScale(new Vector3(zoom, zoom, 1));
             }

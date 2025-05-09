@@ -28,6 +28,8 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media.Media3D;
 using WPFNA;
 
@@ -102,6 +104,7 @@ internal class MainEditorTabPlugin : PluginBase
     private readonly RulerService _rulerService;
     private Cursor _cursor;
     private Keyboard _keyboard;
+    private ScrollBarControlLogic _scrollBarControlLogic;
     private readonly WindowsCursorLogic _windowsCursorLogic;
 
     private EditingManager _editingManager;
@@ -111,7 +114,6 @@ internal class MainEditorTabPlugin : PluginBase
     public MainEditorTabPlugin()
     {
         _windowsCursorLogic = new WindowsCursorLogic();
-        _scrollbarService = new ScrollbarService();
         _guiCommands = Gum.Services.Builder.Get<GuiCommands>();
         _localizationManager = Gum.Services.Builder.Get<LocalizationManager>();
         _editingManager = new EditingManager();
@@ -133,6 +135,8 @@ internal class MainEditorTabPlugin : PluginBase
         _rulerService = new RulerService();
         _toolLayerService = new ToolLayerService();
         _toolFontService = new ToolFontService();
+        _scrollBarControlLogic = new ScrollBarControlLogic();
+        _scrollbarService = new ScrollbarService(_scrollBarControlLogic);
     }
 
     public override bool ShutDown(PluginShutDownReason shutDownReason)
@@ -151,6 +155,12 @@ internal class MainEditorTabPlugin : PluginBase
 
         AssignEvents();
 
+        var grid = new Grid();
+        grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) } );
+        grid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+
+        grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
+        grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto});
 
         var game = new EditorGame(_cameraController);
         // Initialized has to be assigned before creating the fna control or else it won't
@@ -177,6 +187,7 @@ internal class MainEditorTabPlugin : PluginBase
                 game.SystemManagers, 
                 _cursor);
 
+
         };
 
         var fnaControl = new EditorWindow(
@@ -188,15 +199,19 @@ internal class MainEditorTabPlugin : PluginBase
             _selectionManager,
             _windowsCursorLogic);
 
+
+        grid.Children.Add(fnaControl);
+
         _cameraViewModel = new CameraViewModel(game.SystemManagers.Renderer.Camera);
         _cameraController.Initialize(_cameraViewModel);
+        _scrollBarControlLogic.Initialize(grid, fnaControl, game.SystemManagers);
         fnaControl.KeyDownWinforms += HandleKeyDownWinforms;
 
         fnaControl.DataContext = _cameraViewModel;
 
         //fnaControl.KeyDown += OnKeyDown;
 
-        var tab = this.CreateTab(fnaControl, "FNA test");
+        var tab = this.CreateTab(grid, "FNA test");
         tab.SuggestedLocation = TabLocation.RightTop;
         tab.Show();
 

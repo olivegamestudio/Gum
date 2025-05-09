@@ -32,8 +32,7 @@ internal class EditorGame : FnaGame
         var relativeDirectory = FileManager.RelativeDirectory;
         Gum.Initialize(this);
         FileManager.RelativeDirectory = relativeDirectory;
-
-
+        //Gum.SystemManagers.Renderer.Camera.CameraCenterOnScreen = CameraCenterOnScreen.Center;
         base.Initialize();
     }
 
@@ -44,7 +43,6 @@ internal class EditorGame : FnaGame
 
         var keyboard = Gum.Keyboard;
         var cursor = Gum.Cursor;
-
         cursor.Activity(gameTime.TotalGameTime.TotalSeconds, ForcedMouseState);
         keyboard.Activity(gameTime.TotalGameTime.TotalSeconds, this, ForcedKeyboardState);
         //_cameraController.Update();
