@@ -1,13 +1,13 @@
-﻿using EditorTabPlugin_FNA.LibraryFiles;
-using FlatRedBall.SpecializedXnaControls.Input;
+﻿using FlatRedBall.SpecializedXnaControls.Input;
 using FlatRedBall.SpecializedXnaControls.RegionSelection;
 using Gum.Wireframe;
-using Microsoft.Xna.Framework.Graphics;
-using MonoGameGum.Input;
 using RenderingLibrary;
 using RenderingLibrary.Content;
 using RenderingLibrary.Graphics;
 using RenderingLibrary.Math;
+using SkiaGum.Renderables;
+using SkiaGum.Wpf;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,27 +15,25 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using TextureCoordinateSelectionPlugin.ExtensionMethods;
 using ToolsUtilities;
-using WPFNA;
 
 namespace TextureCoordinateSelectionPlugin.Views;
-public class ImageRegionSelectionControl : FnaControl
+public class ImageRegionSelectionControl : GumSKElement
 {
     #region Fields
 
-    ImageData maxAlphaImageData;
+    //ImageData maxAlphaImageData;
 
-    Texture2D mCurrentTexture;
-    Texture2D maxAlphaTexture;
+    SKBitmap mCurrentTexture;
+    SKBitmap maxAlphaTexture;
 
     bool mRoundRectangleSelectorToUnit = true;
     List<RectangleSelector> mRectangleSelectors = new List<RectangleSelector>();
 
     CameraPanningLogic mCameraPanningLogic;
 
-    Cursor mCursor;
-    Keyboard mKeyboard;
+    //Cursor mCursor;
+    //Keyboard mKeyboard;
 
     TimeManager mTimeManager;
 
@@ -113,7 +111,7 @@ public class ImageRegionSelectionControl : FnaControl
         }
     }
 
-    public Texture2D CurrentTexture
+    public SKBitmap CurrentTexture
     {
         get { return mCurrentTexture; }
         set
@@ -137,7 +135,6 @@ public class ImageRegionSelectionControl : FnaControl
                     }
                     else
                     {
-                        CreateMaxAlphaTexture();
                         mCurrentTextureSprite.Visible = true;
                         if (showFullAlpha)
                         {
@@ -156,67 +153,19 @@ public class ImageRegionSelectionControl : FnaControl
         }
     }
 
-    private void CreateMaxAlphaTexture()
-    {
-        if (maxAlphaImageData == null)
-        {
-            maxAlphaImageData = new ImageData(mCurrentTexture.Width, mCurrentTexture.Height, SystemManagers);
-            maxAlphaImageData.CopyFrom(mCurrentTexture);
-
-            MaximizeAlpha();
-
-            maxAlphaTexture = maxAlphaImageData.ToTexture2D(generateMipmaps: false);
-        }
-        else
-        {
-            bool showingBiggerTexture = mCurrentTexture.Width > maxAlphaImageData.Width || mCurrentTexture.Height > maxAlphaImageData.Height;
-            if (showingBiggerTexture)
-            {
-                maxAlphaImageData = new ImageData(mCurrentTexture.Width, mCurrentTexture.Height, SystemManagers);
-            }
-
-            maxAlphaImageData.CopyFrom(mCurrentTexture);
-
-            MaximizeAlpha();
-
-            if (showingBiggerTexture)
-            {
-                if (maxAlphaTexture != null)
-                {
-                    maxAlphaTexture.Dispose();
-                }
-                maxAlphaTexture = maxAlphaImageData.ToTexture2D(generateMipmaps: false);
-            }
-            else
-            {
-                maxAlphaImageData.ToTexture2D(maxAlphaTexture);
-            }
-
-        }
-    }
-
-    private void MaximizeAlpha()
-    {
-        for (int i = 0; i < maxAlphaImageData.Data.Length; i++)
-        {
-            if (maxAlphaImageData.Data[i].A > 0)
-            {
-                maxAlphaImageData.Data[i].A = 255;
-            }
-        }
-    }
 
     private void CreateVisuals()
     {
-        mCurrentTextureSprite = new Sprite(mCurrentTexture);
+        mCurrentTextureSprite = new Sprite();
+        mCurrentTextureSprite.Texture = mCurrentTexture;
         mCurrentTextureSprite.Name = "Image Region Selection Main Sprite";
-        SystemManagers.SpriteManager.Add(mCurrentTextureSprite);
+        //SystemManagers.SpriteManager.Add(mCurrentTextureSprite);
     }
 
-    public Cursor XnaCursor
-    {
-        get { return mCursor; }
-    }
+    //public Cursor XnaCursor
+    //{
+    //    get { return mCursor; }
+    //}
 
     public bool SelectorVisible
     {
@@ -353,7 +302,7 @@ public class ImageRegionSelectionControl : FnaControl
             mTimeManager = new TimeManager();
 
 
-            SystemManagers.Name = "Image Region Selection";
+            //SystemManagers.Name = "Image Region Selection";
             //Assembly assembly = Assembly.GetAssembly(typeof(GraphicsDeviceControl));// Assembly.GetCallingAssembly();
 
             //string targetFntFileName = FileManager.UserApplicationDataForThisApplication + "Font18Arial.fnt";
@@ -370,20 +319,20 @@ public class ImageRegionSelectionControl : FnaControl
 
 
 
-            var contentLoader = new ContentLoader();
-            contentLoader.SystemManagers = SystemManagers;
+            //var contentLoader = new ContentLoader();
+            //contentLoader.SystemManagers = SystemManagers;
 
-            LoaderManager.Self.ContentLoader = contentLoader;
+            //LoaderManager.Self.ContentLoader = contentLoader;
             //LoaderManager.Self.Initialize("Content/InvalidTexture.png", targetFntFileName, Services, mManagers);
 
             CreateNewSelector();
 
-            mCameraPanningLogic = new CameraPanningLogic(SystemManagers, mCursor, mKeyboard);
+            mCameraPanningLogic = new CameraPanningLogic(SystemManagers);
             mCameraPanningLogic.Panning += HandlePanning;
 
 
 
-            MouseWheelFNA += HandleMouseWheel;
+            //MouseWheelFNA += HandleMouseWheel;
             //ZoomNumbers = new Zooming.ZoomNumbers();
         }
     }
@@ -434,56 +383,56 @@ public class ImageRegionSelectionControl : FnaControl
         
         foreach (var item in mRectangleSelectors)
         {
-            item.Activity(mCursor, mKeyboard);
+            //item.Activity(mCursor, mKeyboard);
         }
     }
 
-    void HandleMouseWheel(int delta, Microsoft.Xna.Framework.Point position)
-    {
-        if (mAvailableZoomLevels != null)
-        {
-            int index = ZoomIndex;
-            if (index != -1)
-            {
-                float value = delta;
+    //void HandleMouseWheel(int delta, Microsoft.Xna.Framework.Point position)
+    //{
+    //    if (mAvailableZoomLevels != null)
+    //    {
+    //        int index = ZoomIndex;
+    //        if (index != -1)
+    //        {
+    //            float value = delta;
 
-                float worldX = mCursor.GetWorldX(SystemManagers);
-                float worldY = mCursor.GetWorldY(SystemManagers);
+    //            float worldX = mCursor.GetWorldX(SystemManagers);
+    //            float worldY = mCursor.GetWorldY(SystemManagers);
 
-                float oldCameraX = Camera.X;
-                float oldCameraY = Camera.Y;
+    //            float oldCameraX = Camera.X;
+    //            float oldCameraY = Camera.Y;
 
-                float oldZoom = ZoomValue / 100.0f;
+    //            float oldZoom = ZoomValue / 100.0f;
 
-                bool didZoom = false;
+    //            bool didZoom = false;
 
-                if (value < 0 && index < mAvailableZoomLevels.Count - 1)
-                {
-                    ZoomValue = mAvailableZoomLevels[index + 1];
+    //            if (value < 0 && index < mAvailableZoomLevels.Count - 1)
+    //            {
+    //                ZoomValue = mAvailableZoomLevels[index + 1];
 
-                    didZoom = true;
-                }
-                else if (value > 0 && index > 0)
-                {
-                    ZoomValue = mAvailableZoomLevels[index - 1];
+    //                didZoom = true;
+    //            }
+    //            else if (value > 0 && index > 0)
+    //            {
+    //                ZoomValue = mAvailableZoomLevels[index - 1];
 
-                    didZoom = true;
-                }
+    //                didZoom = true;
+    //            }
 
 
-                if (didZoom)
-                {
-                    AdjustCameraPositionAfterZoom(worldX, worldY,
-                        oldCameraX, oldCameraY, oldZoom, ZoomValue, Camera);
+    //            if (didZoom)
+    //            {
+    //                AdjustCameraPositionAfterZoom(worldX, worldY,
+    //                    oldCameraX, oldCameraY, oldZoom, ZoomValue, Camera);
 
-                    if (MouseWheelZoom != null)
-                    {
-                        MouseWheelZoom(this, null);
-                    }
-                }
-            }
-        }
-    }
+    //                if (MouseWheelZoom != null)
+    //                {
+    //                    MouseWheelZoom(this, null);
+    //                }
+    //            }
+    //        }
+    //    }
+    //}
 
     public static void AdjustCameraPositionAfterZoom(float oldCursorWorldX, float oldCursorWorldY,
         float oldCameraX, float oldCameraY, float oldZoom, float newZoom, Camera camera)

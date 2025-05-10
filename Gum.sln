@@ -63,9 +63,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FnaGumNetFramework", "MonoG
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpFna", "Tool\WpFna\WpFna.csproj", "{97EF294D-13C6-4C1C-B3B6-B444B88FC145}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TextureCoordinateSelectionPlugin_FNA", "Tool\TextureCoordinateSelectionPlugin_FNA\TextureCoordinateSelectionPlugin_FNA\TextureCoordinateSelectionPlugin_FNA.csproj", "{F045EF86-F262-4F7C-9F78-EF532EC08DA8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TextureCoordinateSelectionPlugin_Skia", "Tool\TextureCoordinateSelectionPlugin_FNA\TextureCoordinateSelectionPlugin_FNA\TextureCoordinateSelectionPlugin_Skia.csproj", "{F045EF86-F262-4F7C-9F78-EF532EC08DA8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpFnaAndGum", "WpFnaAndGum\WpFnaAndGum.csproj", "{11EE9BA7-E90D-404C-9686-51CAA7A099C4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkiaGum.Wpf.NetFramework", "Libraries\SkiaGum.Wpf.NetFramework\SkiaGum.Wpf.NetFramework.csproj", "{DE4002D3-CEDE-449C-A419-7EB32D38D787}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkiaGum", "SkiaGum\SkiaGum.csproj", "{A2872381-B21C-4043-9D04-175731A5168B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -173,6 +177,14 @@ Global
 		{11EE9BA7-E90D-404C-9686-51CAA7A099C4}.Debug|x86.Build.0 = Debug|Any CPU
 		{11EE9BA7-E90D-404C-9686-51CAA7A099C4}.Release|x86.ActiveCfg = Release|Any CPU
 		{11EE9BA7-E90D-404C-9686-51CAA7A099C4}.Release|x86.Build.0 = Release|Any CPU
+		{DE4002D3-CEDE-449C-A419-7EB32D38D787}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DE4002D3-CEDE-449C-A419-7EB32D38D787}.Debug|x86.Build.0 = Debug|Any CPU
+		{DE4002D3-CEDE-449C-A419-7EB32D38D787}.Release|x86.ActiveCfg = Release|Any CPU
+		{DE4002D3-CEDE-449C-A419-7EB32D38D787}.Release|x86.Build.0 = Release|Any CPU
+		{A2872381-B21C-4043-9D04-175731A5168B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A2872381-B21C-4043-9D04-175731A5168B}.Debug|x86.Build.0 = Debug|Any CPU
+		{A2872381-B21C-4043-9D04-175731A5168B}.Release|x86.ActiveCfg = Release|Any CPU
+		{A2872381-B21C-4043-9D04-175731A5168B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -206,6 +218,8 @@ Global
 		{97EF294D-13C6-4C1C-B3B6-B444B88FC145} = {C66AD07F-C683-4C24-8E6B-20638ACC3A25}
 		{F045EF86-F262-4F7C-9F78-EF532EC08DA8} = {28BBCA70-AFC9-4C9B-9114-E0E23FA01C3F}
 		{11EE9BA7-E90D-404C-9686-51CAA7A099C4} = {3E451941-5A67-42CD-931E-5DB8C0666178}
+		{DE4002D3-CEDE-449C-A419-7EB32D38D787} = {C66AD07F-C683-4C24-8E6B-20638ACC3A25}
+		{A2872381-B21C-4043-9D04-175731A5168B} = {C66AD07F-C683-4C24-8E6B-20638ACC3A25}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {691B2E2F-58CB-4FD2-8480-695E8DE0CCE2}

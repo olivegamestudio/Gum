@@ -4,8 +4,9 @@ using Gum.Plugins;
 using Gum.Plugins.BaseClasses;
 using Gum.ToolStates;
 using Gum.Wireframe;
-using Microsoft.Xna.Framework.Graphics;
 using RenderingLibrary.Graphics;
+using SkiaGum.Renderables;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
@@ -111,7 +112,7 @@ public class MainTextureCoordinatePlugin : PluginBase
 
     private void RefreshControl()
     {
-        Texture2D textureToAssign = GetTextureToAssign(out bool isNineslice, out float? customFrameTextureCoordinateWidth);
+        SKBitmap textureToAssign = GetTextureToAssign(out bool isNineslice, out float? customFrameTextureCoordinateWidth);
 
         Logic.ControlLogic.Self.Refresh(textureToAssign, isNineslice, customFrameTextureCoordinateWidth);
     }
@@ -129,12 +130,12 @@ public class MainTextureCoordinatePlugin : PluginBase
 
 
 
-    private static Texture2D GetTextureToAssign(out bool isNineslice, out float? customFrameTextureCoordinateWidth)
+    private static SKBitmap GetTextureToAssign(out bool isNineslice, out float? customFrameTextureCoordinateWidth)
     {
         var graphicalUiElement = SelectedState.Self.SelectedIpso as GraphicalUiElement;
         isNineslice = false;
         customFrameTextureCoordinateWidth = null;
-        Texture2D textureToAssign = null;
+        SKBitmap textureToAssign = null;
 
         if (graphicalUiElement != null)
         {
@@ -150,31 +151,31 @@ public class MainTextureCoordinatePlugin : PluginBase
             {
                 var nineSlice = containedRenderable as NineSlice;
                 isNineslice = true;
-                customFrameTextureCoordinateWidth = nineSlice.CustomFrameTextureCoordinateWidth;
-                var isUsingSameTextures =
-                    nineSlice.TopLeftTexture == nineSlice.CenterTexture &&
-                    nineSlice.TopTexture == nineSlice.CenterTexture &&
-                    nineSlice.TopRightTexture == nineSlice.CenterTexture &&
+                //customFrameTextureCoordinateWidth = nineSlice.CustomFrameTextureCoordinateWidth;
+                //var isUsingSameTextures =
+                //    nineSlice.TopLeftTexture == nineSlice.CenterTexture &&
+                //    nineSlice.TopTexture == nineSlice.CenterTexture &&
+                //    nineSlice.TopRightTexture == nineSlice.CenterTexture &&
 
-                    nineSlice.LeftTexture == nineSlice.CenterTexture &&
-                    //nineSlice.TopLeftTexture ==
-                    nineSlice.RightTexture == nineSlice.CenterTexture &&
+                //    nineSlice.LeftTexture == nineSlice.CenterTexture &&
+                //    //nineSlice.TopLeftTexture ==
+                //    nineSlice.RightTexture == nineSlice.CenterTexture &&
 
-                    nineSlice.BottomLeftTexture == nineSlice.CenterTexture &&
-                    nineSlice.BottomTexture == nineSlice.CenterTexture &&
-                    nineSlice.BottomRightTexture == nineSlice.CenterTexture;
+                //    nineSlice.BottomLeftTexture == nineSlice.CenterTexture &&
+                //    nineSlice.BottomTexture == nineSlice.CenterTexture &&
+                //    nineSlice.BottomRightTexture == nineSlice.CenterTexture;
 
-                if (isUsingSameTextures)
-                {
-                    textureToAssign = nineSlice.CenterTexture;
-                }
+                //if (isUsingSameTextures)
+                //{
+                //    textureToAssign = nineSlice.CenterTexture;
+                //}
             }
         }
 
-        if (textureToAssign?.IsDisposed == true)
-        {
-            textureToAssign = null;
-        }
+        //if (textureToAssign?.IsDisposed == true)
+        //{
+        //    textureToAssign = null;
+        //}
 
         return textureToAssign;
     }

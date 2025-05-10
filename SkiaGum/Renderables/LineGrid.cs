@@ -1,8 +1,10 @@
 ﻿using SkiaSharp;
 using System;
 
-namespace SkiaGum.Renderables {
-    public class LineGrid: RenderableBase {
+namespace SkiaGum.Renderables 
+{
+    public class LineGrid: RenderableBase 
+    {
         public ushort CellWidth { get; set; }
         public ushort CellHeight { get; set; }
 

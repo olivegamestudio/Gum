@@ -10,59 +10,70 @@ using SkiaGum.GueDeriving;
 using SkiaGum.Renderables;
 using SkiaPlugin.Managers;
 using System;
+using System.Threading;
 
-namespace RenderingLibrary
+namespace RenderingLibrary;
+
+public enum SystemManagerInitialization
 {
-    public partial class SystemManagers : ISystemManagers
+    Full,
+    Minimal
+}
+
+public partial class SystemManagers : ISystemManagers
+{
+    #region Fields/Properties
+
+    /// <summary>
+    /// The font scale value. This can be used to scale all fonts globally, 
+    /// generally in response to a font scaling value like the Android font scale setting.
+    /// </summary>
+    public static float GlobalFontScale { get; set; } = 1.0f;
+
+    static SystemManagers _default;
+    public static SystemManagers Default
     {
-        #region Fields/Properties
-
-        /// <summary>
-        /// The font scale value. This can be used to scale all fonts globally, 
-        /// generally in response to a font scaling value like the Android font scale setting.
-        /// </summary>
-        public static float GlobalFontScale { get; set; } = 1.0f;
-
-        static SystemManagers _default;
-        public static SystemManagers Default
+        get => _default;
+        set
         {
-            get => _default;
-            set
-            {
-                _default = value;
+            _default = value;
 #if NET6_0_OR_GREATER
 
-                ISystemManagers.Default = value;
+            ISystemManagers.Default = value;
 #endif
-            }
         }
+    }
 
-        public SkiaSharp.SKCanvas Canvas { get; set; }
+    public SkiaSharp.SKCanvas Canvas { get; set; }
 
 
-        public RenderingLibrary.Graphics.Renderer Renderer { get; private set; }
-        public bool EnableTouchEvents { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+    public RenderingLibrary.Graphics.Renderer Renderer { get; private set; }
+    public bool EnableTouchEvents { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
 
-        IRenderer ISystemManagers.Renderer => Renderer;
+    IRenderer ISystemManagers.Renderer => Renderer;
 
-        #endregion
+    #endregion
 
-        public void Initialize()
+    public void Initialize(SystemManagerInitialization initialization = SystemManagerInitialization.Full)
+    {
+        //mPrimaryThreadId = System.Threading.Thread.CurrentThread.ManagedThreadId;
+
+        Renderer = new Renderer();
+        Renderer.Initialize(this);
+
+        //SpriteManager = new SpriteManager();
+
+        //ShapeManager = new ShapeManager();
+
+        //TextManager = new TextManager();
+
+        //SpriteManager.Managers = this;
+        //ShapeManager.Managers = this;
+        //Tex
+        SkiaResourceManager.Initialize(null);
+
+        if(initialization == SystemManagerInitialization.Full)
         {
-            //mPrimaryThreadId = System.Threading.Thread.CurrentThread.ManagedThreadId;
-
-            Renderer = new Renderer();
-            Renderer.Initialize(this);
-
-            //SpriteManager = new SpriteManager();
-
-            //ShapeManager = new ShapeManager();
-
-            //TextManager = new TextManager();
-
-            //SpriteManager.Managers = this;
-            //ShapeManager.Managers = this;
-            //Tex
 
             StandardElementsManager.Self.Initialize();
             StandardElementsManager.Self.CustomGetDefaultState += HandleCustomGetDefaultState;
@@ -71,124 +82,124 @@ namespace RenderingLibrary
             GraphicalUiElement.UpdateFontFromProperties = UpdateFonts;
 
             GraphicalUiElement.AddRenderableToManagers = AddRenderableToManagers;
-            SkiaResourceManager.Initialize(null);
             LoaderManager.Self.ContentLoader = new EmbeddedResourceContentLoader();
             RegisterComponentRuntimeInstantiations();
-
         }
 
-        private void UpdateFonts(IText text, GraphicalUiElement element)
+
+    }
+
+    private void UpdateFonts(IText text, GraphicalUiElement element)
+    {
+        if(text is Text asText)
         {
-            if(text is Text asText)
-            {
-                asText.FontName = element.Font ?? "Arial";
-                asText.IsItalic = element.IsItalic;
-                asText.BoldWeight = element.IsBold ? 700 : 400;
-                asText.FontSize = element.FontSize;
-            }
+            asText.FontName = element.Font ?? "Arial";
+            asText.IsItalic = element.IsItalic;
+            asText.BoldWeight = element.IsBold ? 700 : 400;
+            asText.FontSize = element.FontSize;
         }
+    }
 
-        private void RegisterComponentRuntimeInstantiations()
+    private void RegisterComponentRuntimeInstantiations()
+    {
+        ElementSaveExtensions.RegisterGueInstantiation(
+            "Arc",
+            () => new ArcRuntime());
+
+        ElementSaveExtensions.RegisterGueInstantiation(
+            "Circle",
+            () => new CircleRuntime());
+
+        ElementSaveExtensions.RegisterGueInstantiation(
+            "ColoredCircle",
+            () => new ColoredCircleRuntime());
+
+
+        ElementSaveExtensions.RegisterGueInstantiation(
+            "Container",
+            () => new ContainerRuntime());
+
+        //ElementSaveExtensions.RegisterGueInstantiation(
+        //    "NineSlice",
+        //    () => new NineSliceRuntime());
+
+        ElementSaveExtensions.RegisterGueInstantiation(
+            "Polygon",
+            () => new PolygonRuntime());
+
+        //ElementSaveExtensions.RegisterGueInstantiation(
+        //    "Rectangle",
+        //    () => new RectangleRuntime());
+
+        ElementSaveExtensions.RegisterGueInstantiation(
+            "Sprite",
+            () => new SpriteRuntime());
+
+        ElementSaveExtensions.RegisterGueInstantiation(
+            "Text",
+            () => new TextRuntime());
+    }
+
+    private IRenderable HandleCreateGraphicalComponent(string type, ISystemManagers managers)
+    {
+        switch (type)
         {
-            ElementSaveExtensions.RegisterGueInstantiation(
-                "Arc",
-                () => new ArcRuntime());
-
-            ElementSaveExtensions.RegisterGueInstantiation(
-                "Circle",
-                () => new CircleRuntime());
-
-            ElementSaveExtensions.RegisterGueInstantiation(
-                "ColoredCircle",
-                () => new ColoredCircleRuntime());
-
-
-            ElementSaveExtensions.RegisterGueInstantiation(
-                "Container",
-                () => new ContainerRuntime());
-
-            //ElementSaveExtensions.RegisterGueInstantiation(
-            //    "NineSlice",
-            //    () => new NineSliceRuntime());
-
-            ElementSaveExtensions.RegisterGueInstantiation(
-                "Polygon",
-                () => new PolygonRuntime());
-
-            //ElementSaveExtensions.RegisterGueInstantiation(
-            //    "Rectangle",
-            //    () => new RectangleRuntime());
-
-            ElementSaveExtensions.RegisterGueInstantiation(
-                "Sprite",
-                () => new SpriteRuntime());
-
-            ElementSaveExtensions.RegisterGueInstantiation(
-                "Text",
-                () => new TextRuntime());
+            case "Arc": return new Arc();
+            case "Canvas": return new CanvasRenderable();
+            case "Circle": return new Circle();
+            case "ColoredCircle": return new Circle();
+            case "ColoredRectangle": return new SolidRectangle();
+            case "LottieAnimation": return new LottieAnimation();
+            case "NineSlice": return new NineSlice();
+            case "Polygon": return new Polygon();
+            case "RoundedRectangle": return new RoundedRectangle();
+            case "Svg": return new VectorSprite();
+            case "Sprite": return new Sprite();
+            case "Text": return new Text();
         }
 
-        private IRenderable HandleCreateGraphicalComponent(string type, ISystemManagers managers)
+        return null;
+    }
+
+    private StateSave HandleCustomGetDefaultState(string arg)
+    {
+        switch(arg)
         {
-            switch (type)
-            {
-                case "Arc": return new Arc();
-                case "Canvas": return new CanvasRenderable();
-                case "Circle": return new Circle();
-                case "ColoredCircle": return new Circle();
-                case "ColoredRectangle": return new SolidRectangle();
-                case "LottieAnimation": return new LottieAnimation();
-                case "NineSlice": return new NineSlice();
-                case "Polygon": return new Polygon();
-                case "RoundedRectangle": return new RoundedRectangle();
-                case "Svg": return new VectorSprite();
-                case "Sprite": return new Sprite();
-                case "Text": return new Text();
-            }
-
-            return null;
+            case "Arc":
+                return DefaultStateManager.GetArcState();
+            case "Canvas":
+                return DefaultStateManager.GetCanvasState();
+            case "ColoredCircle":
+                return DefaultStateManager.GetColoredCircleState();
+            case "LottieAnimation":
+                return DefaultStateManager.GetLottieAnimationState();
+            case "RoundedRectangle":
+                return DefaultStateManager.GetRoundedRectangleState();
+            case "Svg":
+                return DefaultStateManager.GetSvgState();
         }
+        return null;
+    }
 
-        private StateSave HandleCustomGetDefaultState(string arg)
+    private void AddRenderableToManagers(IRenderableIpso renderable, ISystemManagers managers, Layer layer)
+    {
+        if (layer == null)
         {
-            switch(arg)
-            {
-                case "Arc":
-                    return DefaultStateManager.GetArcState();
-                case "Canvas":
-                    return DefaultStateManager.GetCanvasState();
-                case "ColoredCircle":
-                    return DefaultStateManager.GetColoredCircleState();
-                case "LottieAnimation":
-                    return DefaultStateManager.GetLottieAnimationState();
-                case "RoundedRectangle":
-                    return DefaultStateManager.GetRoundedRectangleState();
-                case "Svg":
-                    return DefaultStateManager.GetSvgState();
-            }
-            return null;
+            managers.Renderer.Layers[0].Add(renderable);
         }
-
-        private void AddRenderableToManagers(IRenderableIpso renderable, ISystemManagers managers, Layer layer)
+        else
         {
-            if (layer == null)
-            {
-                managers.Renderer.Layers[0].Add(renderable);
-            }
-            else
-            {
-                layer.Add(renderable);
-            }
+            layer.Add(renderable);
         }
+    }
 
-        public void InvalidateSurface()
-        {
+    public void InvalidateSurface()
+    {
 
-        }
+    }
 
-        public void Draw()
-        {
-            Renderer.Draw(this);
-        }
+    public void Draw()
+    {
+        Renderer.Draw(this);
     }
 }

@@ -1,5 +1,4 @@
-﻿using EditorTabPlugin_FNA;
-using Gum;
+﻿using Gum;
 using Gum.DataTypes;
 using Gum.Managers;
 using Gum.Plugins;
@@ -7,17 +6,16 @@ using Gum.PropertyGridHelpers;
 using Gum.ToolStates;
 using Gum.Undo;
 using Gum.Wireframe;
-using Microsoft.Xna.Framework.Graphics;
 using RenderingLibrary.Math;
-using RenderingLibrary.Math.Geometry;
+using SkiaGum.GueDeriving;
+using SkiaGum.Renderables;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TextureCoordinateSelectionPlugin.ExtensionMethods;
 using TextureCoordinateSelectionPlugin.ViewModels;
 using TextureCoordinateSelectionPlugin.Views;
 
@@ -32,7 +30,7 @@ public enum RefreshType
 
 public class ControlLogic : Singleton<ControlLogic>
 {
-    LineRectangle textureOutlineRectangle = null;
+    RoundedRectangleRuntime textureOutlineRectangle = null;
 
     MainControlViewModel ViewModel;
 
@@ -57,7 +55,7 @@ public class ControlLogic : Singleton<ControlLogic>
     bool shouldRefreshAccordingToVariableSets = true;
     MainControl mainControl;
 
-    Texture2D CurrentTexture
+    SKBitmap CurrentTexture
     {
         get => mainControl.InnerControl.CurrentTexture;
         set => mainControl.InnerControl.CurrentTexture = value;
@@ -69,10 +67,10 @@ public class ControlLogic : Singleton<ControlLogic>
         //var control = new ImageRegionSelectionControl();
         var innerControl = mainControl.InnerControl;
 
-        var game = new EditorGame(isDefault:false);
+        //var game = new EditorGame(isDefault:false);
 
-        innerControl.InitializeWithGame(game);
-        innerControl.SystemManagers = game.SystemManagers;
+        //innerControl.InitializeWithGame(game);
+        //innerControl.SystemManagers = game.SystemManagers;
         innerControl.AvailableZoomLevels = new int[]
         {
             3200,
@@ -97,8 +95,10 @@ public class ControlLogic : Singleton<ControlLogic>
         //GumCommands.Self.GuiCommands.AddWinformsControl(control, "Texture Coordinates", TabLocation.Right);
 
         var pluginTab = GumCommands.Self.GuiCommands.AddControl(mainControl, "Texture Coordinates", TabLocation.RightBottom);
-        innerControl.MouseDoubleClickFNA += (mouseButton) =>
-            HandleRegionDoubleClicked(innerControl, ref textureOutlineRectangle);
+
+        
+        //innerControl.MouseDoubleClickFNA += (mouseButton) =>
+        //    HandleRegionDoubleClicked(innerControl, ref textureOutlineRectangle);
 
         ViewModel = new MainControlViewModel();
         mainControl.DataContext = ViewModel;
@@ -118,39 +118,39 @@ public class ControlLogic : Singleton<ControlLogic>
     {
         for (int i = 0; i < 4; i++)
         {
-            nineSliceGuideLines[i] = new Line(mainControl.InnerControl.SystemManagers);
+            nineSliceGuideLines[i] = new Line();
             nineSliceGuideLines[i].Visible = false;
             nineSliceGuideLines[i].Z = 1;
-            nineSliceGuideLines[i].Color = Color.White;
-            nineSliceGuideLines[i].IsDotted = true;
+            nineSliceGuideLines[i].Color = SKColors.White;
+            //nineSliceGuideLines[i].IsDotted = true;
 
-            var alpha = (int)(0.6f * 0xFF);
+            //var alpha = (int)(0.6f * 0xFF);
 
-            nineSliceGuideLines[i].Color =
-                Color.FromArgb(alpha, alpha, alpha, alpha);
+            //nineSliceGuideLines[i].Color =
+            //    Color.FromArgb(alpha, alpha, alpha, alpha);
 
-            mainControl.InnerControl.SystemManagers.Renderer.MainLayer.Add(nineSliceGuideLines[i]);
+            //mainControl.InnerControl.SystemManagers.Renderer.MainLayer.Add(nineSliceGuideLines[i]);
         }
     }
 
     private void CreateLineRectangle()
     {
-        lineGrid = new LineGrid(mainControl.InnerControl.SystemManagers);
-        lineGrid.ColumnWidth = 16;
-        lineGrid.ColumnCount = 16;
+        //lineGrid = new LineGrid(mainControl.InnerControl.SystemManagers);
+        //lineGrid.ColumnWidth = 16;
+        //lineGrid.ColumnCount = 16;
 
-        lineGrid.RowWidth = 16;
-        lineGrid.RowCount = 16;
+        //lineGrid.RowWidth = 16;
+        //lineGrid.RowCount = 16;
 
-        lineGrid.Visible = true;
-        lineGrid.Z = 1;
+        //lineGrid.Visible = true;
+        //lineGrid.Z = 1;
 
-        var alpha = (int)(.2f * 0xFF);
+        //var alpha = (int)(.2f * 0xFF);
 
-        // premultiplied
-        lineGrid.Color = Color.FromArgb(alpha, alpha, alpha, alpha);
+        //// premultiplied
+        //lineGrid.Color = Color.FromArgb(alpha, alpha, alpha, alpha);
 
-        mainControl.InnerControl.SystemManagers.Renderer.MainLayer.Add(lineGrid);
+        //mainControl.InnerControl.SystemManagers.Renderer.MainLayer.Add(lineGrid);
     }
 
     private void HandleViewModelPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -183,7 +183,7 @@ public class ControlLogic : Singleton<ControlLogic>
 
     bool showNineSliceGuides;
     float? customFrameTextureCoordinateWidth;
-    internal void Refresh(Texture2D textureToAssign, bool showNineSliceGuides, float? customFrameTextureCoordinateWidth)
+    internal void Refresh(SKBitmap textureToAssign, bool showNineSliceGuides, float? customFrameTextureCoordinateWidth)
     {
         this.showNineSliceGuides = showNineSliceGuides;
         this.customFrameTextureCoordinateWidth = customFrameTextureCoordinateWidth;
@@ -249,65 +249,65 @@ public class ControlLogic : Singleton<ControlLogic>
                 guideBottom = bottom - customFrameTextureCoordinateWidth.Value;
             }
 
-            var leftLine = nineSliceGuideLines[0];
-            leftLine.X = guideLeft;
-            leftLine.Y = top;
-            leftLine.RelativePoint.X = 0;
-            leftLine.RelativePoint.Y = bottom - top;
+            //var leftLine = nineSliceGuideLines[0];
+            //leftLine.X = guideLeft;
+            //leftLine.Y = top;
+            //leftLine.RelativePoint.X = 0;
+            //leftLine.RelativePoint.Y = bottom - top;
 
-            var rightLine = nineSliceGuideLines[1];
-            rightLine.X = guideRight;
-            rightLine.Y = top;
-            rightLine.RelativePoint.X = 0;
-            rightLine.RelativePoint.Y = bottom - top;
+            //var rightLine = nineSliceGuideLines[1];
+            //rightLine.X = guideRight;
+            //rightLine.Y = top;
+            //rightLine.RelativePoint.X = 0;
+            //rightLine.RelativePoint.Y = bottom - top;
 
-            var topLine = nineSliceGuideLines[2];
-            topLine.X = left;
-            topLine.Y = guideTop;
-            topLine.RelativePoint.X = right - left;
-            topLine.RelativePoint.Y = 0;
+            //var topLine = nineSliceGuideLines[2];
+            //topLine.X = left;
+            //topLine.Y = guideTop;
+            //topLine.RelativePoint.X = right - left;
+            //topLine.RelativePoint.Y = 0;
 
-            var bottomLine = nineSliceGuideLines[3];
-            bottomLine.X = left;
-            bottomLine.Y = guideBottom;
-            bottomLine.RelativePoint.X = right - left;
-            bottomLine.RelativePoint.Y = 0;
+            //var bottomLine = nineSliceGuideLines[3];
+            //bottomLine.X = left;
+            //bottomLine.Y = guideBottom;
+            //bottomLine.RelativePoint.X = right - left;
+            //bottomLine.RelativePoint.Y = 0;
         }
     }
 
     private void RefreshLineGrid()
     {
-        lineGrid.Visible = ViewModel.IsSnapToGridChecked;
+        //lineGrid.Visible = ViewModel.IsSnapToGridChecked;
 
 
-        lineGrid.ColumnWidth = ViewModel.SelectedSnapToGridValue;
-        lineGrid.RowWidth = ViewModel.SelectedSnapToGridValue;
+        //lineGrid.ColumnWidth = ViewModel.SelectedSnapToGridValue;
+        //lineGrid.RowWidth = ViewModel.SelectedSnapToGridValue;
 
-        if (CurrentTexture != null)
-        {
-            var totalWidth = CurrentTexture.Width;
+        //if (CurrentTexture != null)
+        //{
+        //    var totalWidth = CurrentTexture.Width;
 
-            var columnCount = (totalWidth / lineGrid.ColumnWidth);
-            if (columnCount != (int)columnCount)
-            {
-                columnCount++;
-            }
+        //    var columnCount = (totalWidth / lineGrid.ColumnWidth);
+        //    if (columnCount != (int)columnCount)
+        //    {
+        //        columnCount++;
+        //    }
 
-            lineGrid.ColumnCount = (int)columnCount;
+        //    lineGrid.ColumnCount = (int)columnCount;
 
 
-            var totalHeight = CurrentTexture.Height;
-            var rowCount = (totalHeight / lineGrid.RowWidth);
-            if (rowCount != (int)rowCount)
-            {
-                rowCount++;
-            }
+        //    var totalHeight = CurrentTexture.Height;
+        //    var rowCount = (totalHeight / lineGrid.RowWidth);
+        //    if (rowCount != (int)rowCount)
+        //    {
+        //        rowCount++;
+        //    }
 
-            lineGrid.RowCount = (int)rowCount;
-        }
+        //    lineGrid.RowCount = (int)rowCount;
+        //}
     }
 
-    public void HandleRegionDoubleClicked(ImageRegionSelectionControl control, ref LineRectangle textureOutlineRectangle)
+    public void HandleRegionDoubleClicked(ImageRegionSelectionControl control, ref RoundedRectangleRuntime textureOutlineRectangle)
     {
         using var undoLock = UndoManager.Self.RequestLock();
 
@@ -324,8 +324,8 @@ public class ControlLogic : Singleton<ControlLogic>
         {
             graphicalUiElement.TextureAddress = TextureAddress.Custom;
 
-            var cursorX = (int)control.XnaCursor.GetWorldX(control.SystemManagers);
-            var cursorY = (int)control.XnaCursor.GetWorldY(control.SystemManagers);
+            var cursorX = 0;// (int)control.XnaCursor.GetWorldX(control.SystemManagers);
+            var cursorY = 0;// (int)control.XnaCursor.GetWorldY(control.SystemManagers);
 
 
             int left = Math.Max(0, cursorX - 32);
@@ -446,17 +446,17 @@ public class ControlLogic : Singleton<ControlLogic>
         GumCommands.Self.FileCommands.TryAutoSaveCurrentElement();
     }
 
-    public void RefreshOutline(ImageRegionSelectionControl control, ref LineRectangle textureOutlineRectangle)
+    public void RefreshOutline(ImageRegionSelectionControl control, ref RoundedRectangleRuntime textureOutlineRectangle)
     {
         var shouldShowOutline = control.CurrentTexture != null;
         if (shouldShowOutline)
         {
             if (textureOutlineRectangle == null)
             {
-                textureOutlineRectangle = new LineRectangle(control.SystemManagers);
-                textureOutlineRectangle.IsDotted = false;
-                textureOutlineRectangle.Color = Color.FromArgb(128, 255, 255, 255);
-                control.SystemManagers.ShapeManager.Add(textureOutlineRectangle);
+                textureOutlineRectangle = new RoundedRectangleRuntime();
+                //textureOutlineRectangle.IsDotted = false;
+                //textureOutlineRectangle.Color = Color.FromArgb(128, 255, 255, 255);
+                //control.SystemManagers.ShapeManager.Add(textureOutlineRectangle);
             }
             textureOutlineRectangle.Width = control.CurrentTexture.Width;
             textureOutlineRectangle.Height = control.CurrentTexture.Height;

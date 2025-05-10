@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using RenderingLibrary.Math.Geometry;
 using RenderingLibrary;
 using Cursors = System.Windows.Forms.Cursors;
 using WinCursor = System.Windows.Forms.Cursor;
 using RenderingLibrary.Math;
-using MonoGameGum.Input;
-using TextureCoordinateSelectionPlugin.ExtensionMethods;
+using SkiaGum.Renderables;
 
 namespace FlatRedBall.SpecializedXnaControls.RegionSelection
 {
@@ -51,11 +49,11 @@ namespace FlatRedBall.SpecializedXnaControls.RegionSelection
 
         SystemManagers managers;
 
-        List<LineRectangle> mHandles;
+        List<RoundedRectangle> mHandles;
 
         bool mShowHandles = true;
 
-        LineRectangle mLineRectangle;
+        RoundedRectangle mLineRectangle;
 
         // We use a separate set of coordinates so that the line rectangle can snap
         // if using unit coordinates.
@@ -297,13 +295,12 @@ namespace FlatRedBall.SpecializedXnaControls.RegionSelection
             HandleSize = 12;
             ResetsCursorIfNotOver = true;
             mShowHandles = true;
-            mHandles = new List<LineRectangle>();
-            mLineRectangle = new LineRectangle(managers);
+            mHandles = new List<RoundedRectangle>();
+            mLineRectangle = new RoundedRectangle();
 
             for (int i = 0; i < 8; i++)
             {
-                var lineRectangle = new LineRectangle(managers);
-                lineRectangle.IsDotted = false;
+                var lineRectangle = new RoundedRectangle();
                 lineRectangle.Width = HandleSize;
                 lineRectangle.Height = HandleSize;
                 mHandles.Add(lineRectangle);
@@ -313,25 +310,25 @@ namespace FlatRedBall.SpecializedXnaControls.RegionSelection
             Height = 34;
         }
 
-        public bool HasCursorOver(Cursor cursor)
+        public bool HasCursorOver()
         {
-            float worldX = cursor.GetWorldX(managers);
-            float worldY = cursor.GetWorldY(managers);
-            if (this.mLineRectangle.HasCursorOver(worldX, worldY))
-            {
-                return true;
-            }
+            //float worldX = cursor.GetWorldX(managers);
+            //float worldY = cursor.GetWorldY(managers);
+            //if (this.mLineRectangle.HasCursorOver(worldX, worldY))
+            //{
+            //    return true;
+            //}
 
-            if (mShowHandles)
-            {
-                foreach (var rectangle in mHandles)
-                {
-                    if (rectangle.HasCursorOver(worldX, worldY))
-                    {
-                        return true;
-                    }
-                }
-            }
+            //if (mShowHandles)
+            //{
+            //    foreach (var rectangle in mHandles)
+            //    {
+            //        if (rectangle.HasCursorOver(worldX, worldY))
+            //        {
+            //            return true;
+            //        }
+            //    }
+            //}
 
             return false;
         }
@@ -341,24 +338,24 @@ namespace FlatRedBall.SpecializedXnaControls.RegionSelection
         {
             this.managers = managers;
             mLineRectangle.Z = 1;
-            managers.ShapeManager.Add(mLineRectangle);
+            //managers.ShapeManager.Add(mLineRectangle);
 
-            foreach (var handle in mHandles)
-            {
-                handle.Z = 1;
-                managers.ShapeManager.Add(handle);
-            }
+            //foreach (var handle in mHandles)
+            //{
+            //    handle.Z = 1;
+            //    managers.ShapeManager.Add(handle);
+            //}
         }
 
         public void RemoveFromManagers()
         {
             mLineRectangle.Z = 1;
-            managers.ShapeManager.Remove(mLineRectangle);
+            //managers.ShapeManager.Remove(mLineRectangle);
 
-            foreach (var handle in mHandles)
-            {
-                managers.ShapeManager.Remove(handle);
-            }
+            //foreach (var handle in mHandles)
+            //{
+            //    managers.ShapeManager.Remove(handle);
+            //}
         }
 
         public void UpdateHandles()
@@ -391,9 +388,9 @@ namespace FlatRedBall.SpecializedXnaControls.RegionSelection
             mHandles[7].Y = CenterY - halfDim;
         }
 
-        public void Activity(Cursor cursor, Keyboard keyboard)
+        public void Activity()
         {
-            if(AutoSetsCursor && cursor.IsInWindow)
+            //if(AutoSetsCursor && cursor.IsInWindow)
             {
                 //WinCursor cursorToSet = GetCursorToSet(cursor);
 
@@ -406,9 +403,9 @@ namespace FlatRedBall.SpecializedXnaControls.RegionSelection
 
 
 
-            MouseActivity(cursor);
+            //MouseActivity(cursor);
             
-            KeyboardActivity(keyboard);
+            //KeyboardActivity(keyboard);
 
             // Resize even if the cursor isn't in the window - because these may have been made visible by clicking on some winforms UI and we want
             // the size to be properly set
@@ -416,67 +413,67 @@ namespace FlatRedBall.SpecializedXnaControls.RegionSelection
 
         }
 
-        private void KeyboardActivity(Keyboard keyBoard)
-        {
-            if (this.Visible)
-            {
-                bool changed = false;
+        //private void KeyboardActivity(Keyboard keyBoard)
+        //{
+        //    if (this.Visible)
+        //    {
+        //        bool changed = false;
 
-                // don't do this if CTRL is held - that's reserved for camera movement
-                bool isCtrlHeld =
-                    keyBoard.KeyDown(Microsoft.Xna.Framework.Input.Keys.LeftControl) ||
-                    keyBoard.KeyDown(Microsoft.Xna.Framework.Input.Keys.RightControl);
+        //        // don't do this if CTRL is held - that's reserved for camera movement
+        //        bool isCtrlHeld =
+        //            keyBoard.KeyDown(Microsoft.Xna.Framework.Input.Keys.LeftControl) ||
+        //            keyBoard.KeyDown(Microsoft.Xna.Framework.Input.Keys.RightControl);
 
-                if (!isCtrlHeld)
-                {
+        //        if (!isCtrlHeld)
+        //        {
 
-                    if (keyBoard.KeyPushed(Microsoft.Xna.Framework.Input.Keys.Left)
-                        ||
-                        keyBoard.KeyPushed(Microsoft.Xna.Framework.Input.Keys.Right)
-                        ||
-                        keyBoard.KeyPushed(Microsoft.Xna.Framework.Input.Keys.Up)
-                        ||
-                        keyBoard.KeyPushed(Microsoft.Xna.Framework.Input.Keys.Down))
-                    {
-                        // record before any changes are made
-                        RecordOldValues();
-                        StartRegionChanged?.Invoke(this, null);
-                    }
+        //            if (keyBoard.KeyPushed(Microsoft.Xna.Framework.Input.Keys.Left)
+        //                ||
+        //                keyBoard.KeyPushed(Microsoft.Xna.Framework.Input.Keys.Right)
+        //                ||
+        //                keyBoard.KeyPushed(Microsoft.Xna.Framework.Input.Keys.Up)
+        //                ||
+        //                keyBoard.KeyPushed(Microsoft.Xna.Framework.Input.Keys.Down))
+        //            {
+        //                // record before any changes are made
+        //                RecordOldValues();
+        //                StartRegionChanged?.Invoke(this, null);
+        //            }
 
 
-                    if (keyBoard.KeyPushed(Microsoft.Xna.Framework.Input.Keys.Left))
-                    {
-                        this.Left--;
-                        // Width should take care of this
-                        //this.Right--;
-                        changed = true;
-                    }
-                    if (keyBoard.KeyPushed(Microsoft.Xna.Framework.Input.Keys.Right))
-                    {
-                        this.Left++;
-                        // Width should take care of this
-                        //this.Right--;
-                        changed = true;
-                    }
-                    if (keyBoard.KeyPushed(Microsoft.Xna.Framework.Input.Keys.Up))
-                    {
-                        this.Top--;
-                        changed = true;
-                    }
-                    if (keyBoard.KeyPushed(Microsoft.Xna.Framework.Input.Keys.Down))
-                    {
-                        this.Top++;
-                        changed = true;
-                    }
+        //            if (keyBoard.KeyPushed(Microsoft.Xna.Framework.Input.Keys.Left))
+        //            {
+        //                this.Left--;
+        //                // Width should take care of this
+        //                //this.Right--;
+        //                changed = true;
+        //            }
+        //            if (keyBoard.KeyPushed(Microsoft.Xna.Framework.Input.Keys.Right))
+        //            {
+        //                this.Left++;
+        //                // Width should take care of this
+        //                //this.Right--;
+        //                changed = true;
+        //            }
+        //            if (keyBoard.KeyPushed(Microsoft.Xna.Framework.Input.Keys.Up))
+        //            {
+        //                this.Top--;
+        //                changed = true;
+        //            }
+        //            if (keyBoard.KeyPushed(Microsoft.Xna.Framework.Input.Keys.Down))
+        //            {
+        //                this.Top++;
+        //                changed = true;
+        //            }
 
-                    if (changed )
-                    {
-                        RegionChanged?.Invoke(this, null);
-                        EndRegionChanged?.Invoke(this, null);
-                    }
-                }
-            }
-        }
+        //            if (changed )
+        //            {
+        //                RegionChanged?.Invoke(this, null);
+        //                EndRegionChanged?.Invoke(this, null);
+        //            }
+        //        }
+        //    }
+        //}
 
         private void RecordOldValues()
         {
@@ -486,20 +483,20 @@ namespace FlatRedBall.SpecializedXnaControls.RegionSelection
             OldBottom = Bottom;
         }
 
-        private void MouseActivity(Cursor cursor)
+        private void MouseActivity()
         {
 
-            if (mVisible && cursor.IsInWindow)
-            {
-                UpdateHandles();
+            //if (mVisible && cursor.IsInWindow)
+            //{
+            //    UpdateHandles();
 
 
-                PushActivity(cursor);
+            //    PushActivity(cursor);
 
-                DragActivity(cursor);
+            //    DragActivity(cursor);
 
-                ClickActivity(cursor);
-            }
+            //    ClickActivity(cursor);
+            //}
         }
 
         private void ResizeCircleActivity()
@@ -536,61 +533,61 @@ namespace FlatRedBall.SpecializedXnaControls.RegionSelection
         }
 
 
-        private void ClickActivity(Cursor cursor)
+        private void ClickActivity()
         {
-            if (cursor.PrimaryClick)
-            {
-                mSideGrabbed = ResizeSide.None;
+            //if (cursor.PrimaryClick)
+            //{
+            //    mSideGrabbed = ResizeSide.None;
 
-                this.Left = RoundIfNecessary(this.Left);
-                this.Top = RoundIfNecessary(this.Top);
-                this.Width = RoundIfNecessary(this.Width);
-                this.Height= RoundIfNecessary(this.Height);
+            //    this.Left = RoundIfNecessary(this.Left);
+            //    this.Top = RoundIfNecessary(this.Top);
+            //    this.Width = RoundIfNecessary(this.Width);
+            //    this.Height= RoundIfNecessary(this.Height);
 
-                if(shouldRaiseEndRegionChanged)
-                {
-                    EndRegionChanged?.Invoke(this, null);
-                    shouldRaiseEndRegionChanged = false;
-                }
+            //    if(shouldRaiseEndRegionChanged)
+            //    {
+            //        EndRegionChanged?.Invoke(this, null);
+            //        shouldRaiseEndRegionChanged = false;
+            //    }
 
-                UpdateHandles();
-            }
+            //    UpdateHandles();
+            //}
         }
 
-        private void DragActivity(Cursor cursor)
+        private void DragActivity()
         {
-            if (cursor.PrimaryDown && 
-                (cursor.XChange != 0 || cursor.YChange != 0) &&
-                mSideGrabbed != ResizeSide.None)
-            {
+            //if (cursor.PrimaryDown && 
+            //    (cursor.XChange != 0 || cursor.YChange != 0) &&
+            //    mSideGrabbed != ResizeSide.None)
+            //{
 
-                RecordOldValues();
+            //    RecordOldValues();
 
-                float widthMultiplier = 0;
-                float heightMultiplier = 0;
-                float xMultiplier = 0;
-                float yMultiplier = 0;
-
-
-                GetMultipliersFromSideGrabbed(ref widthMultiplier, ref heightMultiplier, ref xMultiplier, ref yMultiplier);
-
-                xMultiplier /= managers.Renderer.Camera.Zoom;
-                yMultiplier /= managers.Renderer.Camera.Zoom;
-                widthMultiplier /= managers.Renderer.Camera.Zoom;
-                heightMultiplier /= managers.Renderer.Camera.Zoom;
+            //    float widthMultiplier = 0;
+            //    float heightMultiplier = 0;
+            //    float xMultiplier = 0;
+            //    float yMultiplier = 0;
 
 
-                this.Left = mCoordinates.X + xMultiplier * cursor.XChange;
-                this.Top = mCoordinates.Y + yMultiplier * cursor.YChange;
-                this.Width = mCoordinates.Width + widthMultiplier * cursor.XChange;
-                this.Height = mCoordinates.Height + heightMultiplier * cursor.YChange;
+            //    GetMultipliersFromSideGrabbed(ref widthMultiplier, ref heightMultiplier, ref xMultiplier, ref yMultiplier);
+
+            //    xMultiplier /= managers.Renderer.Camera.Zoom;
+            //    yMultiplier /= managers.Renderer.Camera.Zoom;
+            //    widthMultiplier /= managers.Renderer.Camera.Zoom;
+            //    heightMultiplier /= managers.Renderer.Camera.Zoom;
 
 
-                RegionChanged?.Invoke(this, null);
+            //    this.Left = mCoordinates.X + xMultiplier * cursor.XChange;
+            //    this.Top = mCoordinates.Y + yMultiplier * cursor.YChange;
+            //    this.Width = mCoordinates.Width + widthMultiplier * cursor.XChange;
+            //    this.Height = mCoordinates.Height + heightMultiplier * cursor.YChange;
 
-                shouldRaiseEndRegionChanged = true;
 
-            }
+            //    RegionChanged?.Invoke(this, null);
+
+            //    shouldRaiseEndRegionChanged = true;
+
+            //}
         }
 
         private void GetMultipliersFromSideGrabbed(ref float widthMultiplier, ref float heightMultiplier, ref float xMultiplier, ref float yMultiplier)
@@ -646,26 +643,26 @@ namespace FlatRedBall.SpecializedXnaControls.RegionSelection
             }
         }
 
-        private void PushActivity(Cursor cursor)
+        private void PushActivity()
         {
-            if (cursor.PrimaryPush)
-            {
-                float worldX = cursor.GetWorldX(managers);
-                float worldY = cursor.GetWorldY(managers);
+            //if (cursor.PrimaryPush)
+            //{
+            //    float worldX = cursor.GetWorldX(managers);
+            //    float worldY = cursor.GetWorldY(managers);
 
-                var sideOver = GetSideOver(
-                    worldX,
-                    worldY);
+            //    var sideOver = GetSideOver(
+            //        worldX,
+            //        worldY);
 
 
-                mSideGrabbed = sideOver;
+            //    mSideGrabbed = sideOver;
 
-                if (mSideGrabbed != ResizeSide.None)
-                {
-                    Pushed?.Invoke(this, null);
-                    StartRegionChanged?.Invoke(this, null);
-                }
-            }
+            //    if (mSideGrabbed != ResizeSide.None)
+            //    {
+            //        Pushed?.Invoke(this, null);
+            //        StartRegionChanged?.Invoke(this, null);
+            //    }
+            //}
         }
 
 
@@ -677,85 +674,85 @@ namespace FlatRedBall.SpecializedXnaControls.RegionSelection
         /// <param name="sideGrabbed">The side that the user has grabbed for resizing.</param>
         /// <param name="cursor">The InputLibrary.Cursor.</param>
         /// <returns>The windows Cursor to set. If null, then this does not reset the cursor.</returns>
-        public WinCursor GetCursorToSet(Cursor cursor)
+        public WinCursor GetCursorToSet()
         {
 
             System.Windows.Forms.Cursor cursorToSet = null;
 
-            if (mVisible && cursor.IsInWindow)
-            {
+            //if (mVisible && cursor.IsInWindow)
+            //{
 
-                float worldX = cursor.GetWorldX(managers);
-                float worldY = cursor.GetWorldY(managers);
+            //    float worldX = cursor.GetWorldX(managers);
+            //    float worldY = cursor.GetWorldY(managers);
 
-                var sideOver = GetSideOver(
-                    worldX,
-                    worldY);
-
-
-                var sideToUse = sideOver;
-                if (mSideGrabbed != ResizeSide.None)
-                {
-                    sideToUse = mSideGrabbed;
-                }
-
-                var flipHorizontal = Width < 0;
-                var flipVertical = Height < 0;
-
-                bool flipCorners = (flipHorizontal && !flipVertical) ||
-                    (!flipHorizontal && flipVertical);
+            //    var sideOver = GetSideOver(
+            //        worldX,
+            //        worldY);
 
 
+            //    var sideToUse = sideOver;
+            //    if (mSideGrabbed != ResizeSide.None)
+            //    {
+            //        sideToUse = mSideGrabbed;
+            //    }
 
-                if (sideToUse != ResizeSide.None)
-                {
-                    switch (sideToUse)
-                    {
-                        case ResizeSide.TopLeft:
-                        case ResizeSide.BottomRight:
+            //    var flipHorizontal = Width < 0;
+            //    var flipVertical = Height < 0;
 
-                            if (flipCorners)
-                            {
-                                cursorToSet = Cursors.SizeNESW;
-                            }
-                            else
-                            {
-                                cursorToSet = Cursors.SizeNWSE;
-                            }
-                            break;
-                        case ResizeSide.TopRight:
-                        case ResizeSide.BottomLeft:
-                            if (flipCorners)
-                            {
-                                cursorToSet = Cursors.SizeNWSE;
-                            }
-                            else
-                            {
-                                cursorToSet = Cursors.SizeNESW;
-                            }
-                            break;
-                        case ResizeSide.Top:
-                        case ResizeSide.Bottom:
-                            cursorToSet = Cursors.SizeNS;
-                            break;
-                        case ResizeSide.Left:
-                        case ResizeSide.Right:
-                            cursorToSet = Cursors.SizeWE;
-                            break;
-                        case ResizeSide.Middle:
-                            if (ShowMoveCursorWhenOver)
-                            {
-                                cursorToSet = Cursors.SizeAll;
-                            }
-                            break;
-                        case ResizeSide.None:
+            //    bool flipCorners = (flipHorizontal && !flipVertical) ||
+            //        (!flipHorizontal && flipVertical);
 
-                            break;
-                    }
 
-                }
 
-            }
+            //    if (sideToUse != ResizeSide.None)
+            //    {
+            //        switch (sideToUse)
+            //        {
+            //            case ResizeSide.TopLeft:
+            //            case ResizeSide.BottomRight:
+
+            //                if (flipCorners)
+            //                {
+            //                    cursorToSet = Cursors.SizeNESW;
+            //                }
+            //                else
+            //                {
+            //                    cursorToSet = Cursors.SizeNWSE;
+            //                }
+            //                break;
+            //            case ResizeSide.TopRight:
+            //            case ResizeSide.BottomLeft:
+            //                if (flipCorners)
+            //                {
+            //                    cursorToSet = Cursors.SizeNWSE;
+            //                }
+            //                else
+            //                {
+            //                    cursorToSet = Cursors.SizeNESW;
+            //                }
+            //                break;
+            //            case ResizeSide.Top:
+            //            case ResizeSide.Bottom:
+            //                cursorToSet = Cursors.SizeNS;
+            //                break;
+            //            case ResizeSide.Left:
+            //            case ResizeSide.Right:
+            //                cursorToSet = Cursors.SizeWE;
+            //                break;
+            //            case ResizeSide.Middle:
+            //                if (ShowMoveCursorWhenOver)
+            //                {
+            //                    cursorToSet = Cursors.SizeAll;
+            //                }
+            //                break;
+            //            case ResizeSide.None:
+
+            //                break;
+            //        }
+
+            //    }
+
+            //}
 
             if (ResetsCursorIfNotOver && cursorToSet == null)
             {
