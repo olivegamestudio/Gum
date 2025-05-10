@@ -557,7 +557,7 @@ namespace Gum.Plugins.InternalPlugins.EditorTab.Views
                         yBelow = GraphicalUiElement.CanvasHeight;
                     }
 
-                    var x = _cursor.GetWorldX(mManagers);
+                    var x = _cursor.GetWorldX(mManagers, _layerService.RulerLayer);
 
                     if (yAbove != null)
                     {
@@ -596,7 +596,7 @@ namespace Gum.Plugins.InternalPlugins.EditorTab.Views
                         xRight = GraphicalUiElement.CanvasWidth;
                     }
 
-                    var y = _cursor.GetWorldY(mManagers);
+                    var y = _cursor.GetWorldY(mManagers, _layerService.RulerLayer);
 
                     if (xLeft != null)
                     {

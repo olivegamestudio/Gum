@@ -33,6 +33,10 @@ internal class EditorGame : FnaGame
         Gum.Initialize(this);
         FileManager.RelativeDirectory = relativeDirectory;
         //Gum.SystemManagers.Renderer.Camera.CameraCenterOnScreen = CameraCenterOnScreen.Center;
+
+
+        RenderingLibrary.Graphics.Renderer.ApplyCameraZoomOnWorldTranslation = false;
+
         base.Initialize();
     }
 

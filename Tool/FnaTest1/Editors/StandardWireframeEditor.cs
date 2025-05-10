@@ -48,6 +48,8 @@ namespace Gum.Wireframe.Editors
         bool mHasGrabbed = false;
         private readonly ElementCommands _elementCommands;
         private readonly SelectionManager _selectionManager;
+        private readonly SystemManagers _systemManagers;
+        private readonly Layer layer;
 
         public MonoGameGum.Input.Cursor Cursor
         {
@@ -87,6 +89,8 @@ namespace Gum.Wireframe.Editors
         {
             _elementCommands = GumCommands.Self.ProjectCommands.ElementCommands;
             _selectionManager = selectionManager;
+            _systemManagers = systemManagers;
+            this.layer = layer;
 
             mResizeHandles = new ResizeHandles(layer, lineColor);
             mResizeHandles.ShowOrigin = true;
@@ -255,8 +259,8 @@ namespace Gum.Wireframe.Editors
                 var originX = gue.AbsoluteX;
                 var originY = gue.AbsoluteY;
 
-                var cursorX = GumService.Default.Cursor.GetWorldX(SystemManagers.Default);
-                var cursorY = GumService.Default.Cursor.GetWorldY(SystemManagers.Default);
+                var cursorX = GumService.Default.Cursor.GetWorldX(_systemManagers, layer);
+                var cursorY = GumService.Default.Cursor.GetWorldY(_systemManagers, layer);
 
                 var angleInRadians = (float)System.Math.Atan2(cursorY - originY, cursorX - originX);
 
@@ -298,8 +302,8 @@ namespace Gum.Wireframe.Editors
         private void RefreshRotationGrabbed()
         {
             var cursor = GumService.Default.Cursor;
-            var worldX = cursor.GetWorldX(SystemManagers.Default);
-            var worldY = cursor.GetWorldY(SystemManagers.Default);
+            var worldX = cursor.GetWorldX(_systemManagers, layer);
+            var worldY = cursor.GetWorldY(_systemManagers, layer);
 
             isRotationHighlighted = rotationHandle.HasCursorOver(worldX, worldY);
         }
@@ -772,8 +776,8 @@ namespace Gum.Wireframe.Editors
 
         private void RefreshSideOver()
         {
-            var worldX = Cursor.GetWorldX(SystemManagers.Default);
-            var worldY = Cursor.GetWorldY(SystemManagers.Default);
+            var worldX = Cursor.GetWorldX(_systemManagers, layer);
+            var worldY = Cursor.GetWorldY(_systemManagers, layer);
 
             if (mResizeHandles.Visible == false)
             {
@@ -1076,8 +1080,8 @@ namespace Gum.Wireframe.Editors
                     IRenderableIpso ipso = WireframeObjectManager.Self.GetRepresentation(instanceSave, elementStack);
 
                     var cursor = GumService.Default.Cursor;
-                    float cursorX = cursor.GetWorldX(SystemManagers.Default);
-                    float cursorY = cursor.GetWorldY(SystemManagers.Default);
+                    float cursorX = cursor.GetWorldX(_systemManagers, layer);
+                    float cursorY = cursor.GetWorldY(_systemManagers, layer);
 
                     float top = ipso.GetAbsoluteTop();
                     float bottom = ipso.GetAbsoluteBottom();

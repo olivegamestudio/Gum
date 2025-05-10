@@ -59,6 +59,8 @@ public class SelectionManager
     List<GraphicalUiElement> mSelectedIpsos = new List<GraphicalUiElement>();
     IPositionedSizedObject mHighlightedIpso;
 
+    Layer Layer => _layerService.OverlayLayer;
+
     GraphicalOutline mGraphicalOutline;
 
 
@@ -283,9 +285,9 @@ public class SelectionManager
 
             System.Windows.Input.Cursor cursorToSet = System.Windows.Input.Cursors.Arrow;
 
-            float worldXAt = Cursor.GetWorldX(SystemManagers.Default);
-            float worldYAt = Cursor.GetWorldY(SystemManagers.Default);
-
+            float worldXAt = Cursor.GetWorldX(_systemManagers, Layer);
+            float worldYAt = Cursor.GetWorldY(_systemManagers, Layer);
+            System.Diagnostics.Debug.WriteLine($"{worldXAt}  {worldYAt}");
             IPositionedSizedObject representationOver = null;
 
             if (_editingManager.ContextMenuStrip?.Visible == true)
@@ -619,7 +621,8 @@ public class SelectionManager
                 WireframeEditor = new PolygonWireframeEditor(
                     _layerService.OverlayLayer, 
                     global::Gum.Managers.HotkeyManager.Self,
-                    this);
+                    this,
+                    _systemManagers);
             }
         }
         else if(SelectedGues.Count > 0 && SelectedGue?.Tag is ScreenSave == false)
@@ -641,7 +644,8 @@ public class SelectionManager
                 WireframeEditor = new PolygonWireframeEditor(
                     _layerService.OverlayLayer,
                     global::Gum.Managers.HotkeyManager.Self,
-                    this);
+                    this,
+                    _systemManagers);
             }
             else
             {
@@ -722,8 +726,8 @@ public class SelectionManager
             // is already selected
             if (WireframeEditor?.HasCursorOver != true)
             {
-                float x = Cursor.GetWorldX(SystemManagers.Default);
-                float y = Cursor.GetWorldY(SystemManagers.Default);
+                float x = Cursor.GetWorldX(_systemManagers, Layer);
+                float y = Cursor.GetWorldY(_systemManagers, Layer);
 
                 List<ElementWithState> elementStack = new List<ElementWithState>();
                 elementStack.Add(new ElementWithState(_selectedState.SelectedElement));

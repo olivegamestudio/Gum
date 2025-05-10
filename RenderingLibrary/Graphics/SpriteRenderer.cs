@@ -176,7 +176,8 @@ namespace RenderingLibrary.Graphics
 
                 basicEffect.View =  GetZoomAndMatrix(layer, camera);
 
-                if(Renderer.ApplyCameraZoomOnWorldTranslation || 
+                if(
+                    Renderer.ApplyCameraZoomOnWorldTranslation || 
                     layer.LayerCameraSettings?.IsInScreenSpace == true)
                 {
                     basicEffect.View *= Microsoft.Xna.Framework.Matrix.CreateTranslation(-camera.ClientWidth / 2.0f, -camera.ClientHeight / 2.0f, 0);

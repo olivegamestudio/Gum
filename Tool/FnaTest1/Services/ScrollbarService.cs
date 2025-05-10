@@ -84,7 +84,7 @@ public class ScrollbarService
     {
         /// todo - need to get this working...
         //scrollBarControlLogic = new ScrollBarControlLogic(gumEditorPanel, wireframeControl1);
-        //scrollBarControlLogic.SetDisplayedArea(800, 600);
+        scrollBarControlLogic.SetDisplayedArea(800, 600);
     }
 
     public void HandleCameraChanged()
@@ -92,17 +92,17 @@ public class ScrollbarService
         // I don't think we need to update
         // the canvas width or height anymore.
         // We do that whenever an object is selected...
-        //if (ProjectManager.Self.GumProjectSave != null)
-        //{
+        if (ProjectManager.Self.GumProjectSave != null)
+        {
 
-        //    scrollBarControlLogic.SetDisplayedArea(
-        //        ProjectManager.Self.GumProjectSave.DefaultCanvasWidth,
-        //        ProjectManager.Self.GumProjectSave.DefaultCanvasHeight);
-        //}
-        //else
-        //{
-        //    scrollBarControlLogic.SetDisplayedArea(800, 600);
-        //}
+            scrollBarControlLogic.SetDisplayedArea(
+                ProjectManager.Self.GumProjectSave.DefaultCanvasWidth,
+                ProjectManager.Self.GumProjectSave.DefaultCanvasHeight);
+        }
+        else
+        {
+            scrollBarControlLogic.SetDisplayedArea(800, 600);
+        }
 
         scrollBarControlLogic.UpdateScrollBars();
         scrollBarControlLogic.UpdateScrollBarsToCameraPosition();
@@ -111,7 +111,7 @@ public class ScrollbarService
     public void HandleXnaInitialized()
     {
         //scrollBarControlLogic.Managers = global::RenderingLibrary.SystemManagers.Default;
-        //scrollBarControlLogic.UpdateScrollBars();
+        scrollBarControlLogic.UpdateScrollBars();
     }
 
     public void HandleWireframeResized()

@@ -3,6 +3,7 @@ using Vector2 = System.Numerics.Vector2;
 using Vector3 = System.Numerics.Vector3;
 using Matrix = System.Numerics.Matrix4x4;
 using MonoGameGum.Input;
+using RenderingLibrary.Graphics;
 
 namespace InputLibrary
 {
@@ -52,7 +53,7 @@ namespace InputLibrary
         }
 
 
-        public static float GetWorldX(this Cursor cursor, SystemManagers managers)
+        public static float GetWorldX(this Cursor cursor, SystemManagers managers, Layer layer)
         {
             if (cursor.PrimaryDown)
             {
@@ -62,23 +63,39 @@ namespace InputLibrary
             Vector3 transformed = new Vector3(cursor.X, cursor.Y, 0);
             Matrix matrix = managers.Renderer.Camera.GetTransformationMatrix();
             Matrix.Invert(matrix, out matrix);
-
             TransformVector(ref transformed, ref matrix);
 
+            if(layer?.LayerCameraSettings?.IsInScreenSpace == true)
+            {
+                return transformed.X;
 
-            return transformed.X;
+            }
+            else
+            {
+                return transformed.X - managers.Renderer.Camera.ClientWidth / 2.0f;
+            }
+
+
+
         }
 
-        public static float GetWorldY(this Cursor cursor, SystemManagers managers)
+        public static float GetWorldY(this Cursor cursor, SystemManagers managers, Layer layer)
         {
             Vector3 transformed = new Vector3(cursor.X, cursor.Y, 0);
             Matrix matrix = managers.Renderer.Camera.GetTransformationMatrix();
             Matrix.Invert(matrix, out matrix);
 
             TransformVector(ref transformed, ref matrix);
+            if (layer?.LayerCameraSettings?.IsInScreenSpace == true)
+            {
+                return transformed.Y;
 
+            }
+            else
+            {
+                return transformed.Y - managers.Renderer.Camera.ClientHeight / 2.0f;
+            }
 
-            return transformed.Y;
 
         }
     }

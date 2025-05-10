@@ -25,7 +25,7 @@ namespace Gum.Wireframe.Editors
         OriginDisplay originDisplay;
 
         const float RadiusAtNoZoom = 5;
-
+        private readonly SystemManagers _systemManagers;
         int? grabbedIndex = null;
         int? selectedIndex = null;
 
@@ -49,8 +49,8 @@ namespace Gum.Wireframe.Editors
 
                 var cursor = GumService.Default.Cursor;
 
-                var x = cursor.GetWorldX(SystemManagers.Default);
-                var y = cursor.GetWorldY(SystemManagers.Default);
+                var x = cursor.GetWorldX(_systemManagers, layer);
+                var y = cursor.GetWorldY(_systemManagers, layer);
 
                 foreach(var gue in selectedPolygons)
                 {
@@ -103,8 +103,10 @@ namespace Gum.Wireframe.Editors
 
         #region Constructor/Update To
 
-        public PolygonWireframeEditor(Layer layer, HotkeyManager hotkeyManager, SelectionManager selectionManager) : base(hotkeyManager, selectionManager)
+        public PolygonWireframeEditor(Layer layer, HotkeyManager hotkeyManager, SelectionManager selectionManager,
+            SystemManagers systemManagers) : base(hotkeyManager, selectionManager)
         {
+            _systemManagers = systemManagers;
             if(addPointTexture == null)
             {
                 var gumExePath = System.IO.Path.GetDirectoryName(
@@ -253,8 +255,8 @@ namespace Gum.Wireframe.Editors
             if (canUpdatePoint)
             {
 
-                var worldX = GumService.Default.Cursor.GetWorldX(SystemManagers.Default);
-                var worldY = GumService.Default.Cursor.GetWorldY(SystemManagers.Default);
+                var worldX = GumService.Default.Cursor.GetWorldX(_systemManagers, layer);
+                var worldY = GumService.Default.Cursor.GetWorldY(_systemManagers, layer);
 
                 var zoom = Renderer.Self.Camera.Zoom;
 
@@ -288,8 +290,8 @@ namespace Gum.Wireframe.Editors
             var cursor = GumService.Default.Cursor;
             if (cursor.PrimaryPush)
             {
-                var x = cursor.GetWorldX(SystemManagers.Default);
-                var y = cursor.GetWorldY(SystemManagers.Default);
+                var x = cursor.GetWorldX(_systemManagers, layer);
+                var y = cursor.GetWorldY(_systemManagers, layer);
 
                 mHasChangedAnythingSinceLastPush = false;
 
@@ -401,7 +403,7 @@ namespace Gum.Wireframe.Editors
 
             if (grabbedIndex == null && linePolygon != null)
             {
-                indexOver = GetIndexOver(cursor.GetWorldX(SystemManagers.Default), cursor.GetWorldY(SystemManagers.Default));
+                indexOver = GetIndexOver(cursor.GetWorldX(_systemManagers, layer), cursor.GetWorldY(_systemManagers, layer));
             }
 
             for(int i = 0; i < pointNodes.Count; i++)
