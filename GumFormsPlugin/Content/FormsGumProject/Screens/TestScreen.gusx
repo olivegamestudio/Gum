@@ -103,7 +103,7 @@
     <Variable>
       <Type>float</Type>
       <Name>TextInstance1.Height</Name>
-      <Value xsi:type="xsd:float">150</Value>
+      <Value xsi:type="xsd:float">112</Value>
       <SetsValue>true</SetsValue>
     </Variable>
     <Variable>
@@ -121,7 +121,7 @@
     <Variable>
       <Type>float</Type>
       <Name>TextInstance1.Width</Name>
-      <Value xsi:type="xsd:float">262</Value>
+      <Value xsi:type="xsd:float">210</Value>
       <SetsValue>true</SetsValue>
     </Variable>
   </State>

@@ -89,9 +89,12 @@ public class GumService
                 "so that the Game has a valid GrahicsDevice");
         }
 
-
-
         return InitializeInternal(game, game.GraphicsDevice, gumProjectFile);
+    }
+
+    public void Initialize(Game game, SystemManagers systemManagers)
+    {
+        InitializeInternal(game, game.GraphicsDevice, systemManagers: systemManagers);
     }
 
     [Obsolete("Experimental - this API may change in future versions")]
@@ -135,7 +138,7 @@ public class GumService
     }
 
     bool hasBeenInitialized = false;
-    GumProjectSave? InitializeInternal(Game game, GraphicsDevice graphicsDevice, string? gumProjectFile = null)
+    GumProjectSave? InitializeInternal(Game game, GraphicsDevice graphicsDevice, string? gumProjectFile = null, SystemManagers systemManagers = null)
     {
         if(hasBeenInitialized)
         {
@@ -147,12 +150,14 @@ public class GumService
         _game = game;
         RegisterRuntimeTypesThroughReflection();
 
-        this.SystemManagers = new SystemManagers();
-
-        SystemManagers.Default = this.SystemManagers;
-#if NET6_0_OR_GREATER
-        ISystemManagers.Default = this.SystemManagers;
-#endif
+        this.SystemManagers = systemManagers ?? new SystemManagers();
+        if(systemManagers == null)
+        {
+            SystemManagers.Default = this.SystemManagers;
+    #if NET6_0_OR_GREATER
+            ISystemManagers.Default = this.SystemManagers;
+    #endif
+        }
         this.SystemManagers.Initialize(graphicsDevice, fullInstantiation: true);
         FormsUtilities.InitializeDefaults(systemManagers:this.SystemManagers);
 

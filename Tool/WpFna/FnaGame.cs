@@ -25,7 +25,8 @@ public class FnaGame : Game
 
     public event Action Initialized;
     public event Action<GameTime> Updated;
-    public DrawCallback OnDraw;
+
+    public DrawCallback DrawCalled;
 
     public delegate void DrawCallback(SpriteBatch spriteBatch);
 

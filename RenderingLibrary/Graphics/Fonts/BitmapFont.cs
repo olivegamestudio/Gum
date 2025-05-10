@@ -96,7 +96,7 @@ public class BitmapFont : IDisposable
 
     #region Methods
 
-    public BitmapFont(string fontFile, SystemManagers managers)
+    public BitmapFont(string fontFile)
     {
         string fontContents = FileManager.FromFileText(fontFile);
         mFontFile = FileManager.Standardize(fontFile, preserveCase:true);
@@ -105,6 +105,10 @@ public class BitmapFont : IDisposable
         ReloadTextures(fontFile, fontContents);
 
         SetFontPattern(fontContents);
+
+    }
+    public BitmapFont(string fontFile, SystemManagers managers) : this(fontFile)
+    {
     }
 
     private void ReloadTextures(string fontFile, string fontContents)

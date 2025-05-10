@@ -37,6 +37,7 @@ public class FnaControl : HwndHost
     #region Input Events
     public event Action<bool, Microsoft.Xna.Framework.Point> MouseMoveFNA;
     public event Action<MouseButton> MouseUpFNA;
+    public event Action<MouseButton> MouseDoubleClickFNA;
     public event Action<MouseButton, Microsoft.Xna.Framework.Point> MouseDownFNA;
     public event Action<int, Microsoft.Xna.Framework.Point> MouseWheelFNA;
     public event Action MouseEnterFNA;
@@ -62,13 +63,13 @@ public class FnaControl : HwndHost
     Keys[] KeysArray = new Keys[0];
 
     public bool IsMouseInside { get; private set; }
-    public bool WasMouseInside {  get; private set; }
+    public bool WasMouseInside { get; private set; }
     private Rect windowRect;
     private DpiScale dpiScale;
     bool wasDragging;
     #endregion
 
-    public FnaControl(FnaGame fnaGame)
+    public FnaControl()
     {
         //force graphics driver: "SDL_GPU" (default, uses D3D12), "D3D11" or "Vulkan"
         //Environment.SetEnvironmentVariable("FNA3D_FORCE_DRIVER", "D3D11");
@@ -87,11 +88,11 @@ public class FnaControl : HwndHost
             {
                 winformsKey = winformsKey | System.Windows.Forms.Keys.Shift;
             }
-            if(Keys.Contains(Microsoft.Xna.Framework.Input.Keys.LeftAlt) || Keys.Contains(Microsoft.Xna.Framework.Input.Keys.RightAlt))
+            if (Keys.Contains(Microsoft.Xna.Framework.Input.Keys.LeftAlt) || Keys.Contains(Microsoft.Xna.Framework.Input.Keys.RightAlt))
             {
                 winformsKey = winformsKey | System.Windows.Forms.Keys.Alt;
             }
-            if(Keys.Contains(Microsoft.Xna.Framework.Input.Keys.LeftControl) || Keys.Contains(Microsoft.Xna.Framework.Input.Keys.RightControl))
+            if (Keys.Contains(Microsoft.Xna.Framework.Input.Keys.LeftControl) || Keys.Contains(Microsoft.Xna.Framework.Input.Keys.RightControl))
             {
                 winformsKey = winformsKey | System.Windows.Forms.Keys.Control;
             }
@@ -134,8 +135,13 @@ public class FnaControl : HwndHost
             Debug.WriteLine($"Key: {string.Join(",", KeysArray)}");
         }
 
-            //create game and initialize
-            Game = fnaGame;
+
+    }
+
+    public void InitializeWithGame(FnaGame fnaGame)
+    {
+        //create game and initialize
+        Game = fnaGame;
         Game.RunOneFrame();
 
         //spin up game update thread
@@ -153,7 +159,6 @@ public class FnaControl : HwndHost
         // threads or else we get a crash.
         // Instead, I just run an async loop
         GameExecution();
-
     }
 
     protected override HandleRef BuildWindowCore(HandleRef hwndParent)
@@ -169,7 +174,7 @@ public class FnaControl : HwndHost
         Game.Window.AllowUserResizing = true;
 
         //make the window a child window instead of top-level application window and give it focus
-        var oldStyle = (Win32Api.WindowStyles)Win32Api.SetWindowLong(gameHandle, Win32Api.GWL_STYLE, 
+        var oldStyle = (Win32Api.WindowStyles)Win32Api.SetWindowLong(gameHandle, Win32Api.GWL_STYLE,
             (uint)(Win32Api.WindowStyles.WS_CHILD | Win32Api.WindowStyles.WS_TABSTOP));
         Win32Api.SetParent(gameHandle, hwndParent.Handle);
         Win32Api.SetFocus(gameHandle);
@@ -225,7 +230,7 @@ public class FnaControl : HwndHost
 
             var msToSleep = desiredMs - (afterRunOneFrame - start);
             // testing
-            await Task.Delay((int)System.Math.Max(1,msToSleep));
+            await Task.Delay((int)System.Math.Max(1, msToSleep));
 
             var afterSleep = stopWatch.Elapsed.TotalSeconds;
 
@@ -264,7 +269,7 @@ public class FnaControl : HwndHost
         var source = PresentationSource.FromVisual(this);
         var transformToDevice = source.CompositionTarget.TransformToDevice;
         var pixelSize = (Size)transformToDevice.Transform((Vector)RenderSize);
-        var windowOrigin = this.PointToScreen(new System.Windows.Point(0,0));
+        var windowOrigin = this.PointToScreen(new System.Windows.Point(0, 0));
         windowRect = new Rect(windowOrigin, pixelSize);
         dpiScale = VisualTreeHelper.GetDpi(this);
     }
@@ -363,7 +368,7 @@ public class FnaControl : HwndHost
             if (contains)
                 MouseUpFNA?.Invoke(MouseButton.Left);
         }
-        else if(wm == WM.MBUTTONUP)
+        else if (wm == WM.MBUTTONUP)
         {
             MiddleMouseButton = ButtonState.Released;
             MSLLHOOKSTRUCT msll = (MSLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(MSLLHOOKSTRUCT));
@@ -392,7 +397,7 @@ public class FnaControl : HwndHost
     //Handle Mouse and Keyboard Events
     //Note: this seems to swallow key events eventually, not sure why but
     //will cause problems if you want to use Keyboard.GetState in Game class
-    protected override IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, 
+    protected override IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam,
         IntPtr lParam, ref bool handled)
     {
         var windowsMessage = (WM)msg;
@@ -419,13 +424,12 @@ public class FnaControl : HwndHost
                 LeftMouseButton = ButtonState.Released;
                 handled = true;
 
-                if (MouseUpFNA != null)
-                    MouseUpFNA(MouseButton.Left);
+                MouseUpFNA?.Invoke(MouseButton.Left);
                 break;
-            //case 0x203: //left mouse double click
-            //    handled = true;
-            //    // this.Focus();
-            //    break;
+            case WM.LBUTTONDBLCLK:
+                handled = true;
+                MouseDoubleClickFNA?.Invoke(MouseButton.Left);
+                break;
             case WM.RBUTTONDOWN: //right mouse down
                 RightMouseButton = ButtonState.Pressed;
                 handled = true;

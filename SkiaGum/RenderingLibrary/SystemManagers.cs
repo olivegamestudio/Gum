@@ -30,7 +30,10 @@ namespace RenderingLibrary
             set
             {
                 _default = value;
+#if NET6_0_OR_GREATER
+
                 ISystemManagers.Default = value;
+#endif
             }
         }
 

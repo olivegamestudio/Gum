@@ -202,7 +202,7 @@ namespace Gum.Wireframe
 
 
             IPositionedSizedObject asIpso = asGue;
-            float zoom = Renderer.Self.Camera.Zoom;
+            float zoom = _systemManagers.Renderer.Camera.Zoom;
 
             float offset = RadiusAtNoZoom * 1.5f / zoom;
 

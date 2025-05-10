@@ -9,26 +9,41 @@ using System.Text;
 using System.Threading.Tasks;
 using ToolsUtilities;
 using Color = Microsoft.Xna.Framework.Color;
-using Gum.Plugins.InternalPlugins.EditorTab.Services;
+
 using RenderingLibrary;
 using Gum;
 
 namespace EditorTabPlugin_FNA;
-internal class EditorGame : FnaGame
+public class EditorGame : FnaGame
 {
     public SystemManagers SystemManagers => Gum.SystemManagers;
 
-    GumService Gum => GumService.Default;
+    GumService Gum;
 
-    public EditorGame() : base ()
+    bool _isDefault;
+
+    public Microsoft.Xna.Framework.Color ClearColor { get; set; }
+
+    public EditorGame(bool isDefault) : base ()
     {
-        
+        _isDefault = isDefault;
     }
 
     protected override void Initialize()
     {
         var relativeDirectory = FileManager.RelativeDirectory;
-        Gum.Initialize(this);
+
+        //if(_isDefault)
+        //{
+        //    GumService.Default.Initialize(this);
+        //    Gum = GumService.Default;
+        //}
+        //else
+        //{
+            Gum = new GumService();
+            var systemManagers = new SystemManagers();
+            Gum.Initialize(this, systemManagers);
+        //}
         FileManager.RelativeDirectory = relativeDirectory;
         //Gum.SystemManagers.Renderer.Camera.CameraCenterOnScreen = CameraCenterOnScreen.Center;
 
@@ -49,30 +64,17 @@ internal class EditorGame : FnaGame
         keyboard.Activity(gameTime.TotalGameTime.TotalSeconds, this, ForcedKeyboardState);
         //_cameraController.Update();
 
-
         // todo - pull in DragDropManager.
         // Look at DragDropManager.Activity "todo - move this"
+
 
         base.Update(gameTime);
     }
 
     protected override void Draw(GameTime gameTime)
     {
-        var clearColor = new Microsoft.Xna.Framework.Color(
-        ProjectManager.Self.GeneralSettingsFile.CheckerColor1R,
-                ProjectManager.Self.GeneralSettingsFile.CheckerColor1G,
-                ProjectManager.Self.GeneralSettingsFile.CheckerColor1B);
-
-        GraphicsDevice.Clear(clearColor);
+        GraphicsDevice.Clear(ClearColor);
 
         Gum.Draw();
-
-        //sb.Begin();
-
-        //if (OnDraw != null)
-        //    OnDraw(sb);
-
-
-        //sb.End();
     }
 }

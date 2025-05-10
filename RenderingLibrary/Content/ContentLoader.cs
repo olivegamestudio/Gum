@@ -24,6 +24,10 @@ namespace RenderingLibrary.Content
 #endif
 
         //List<Atlas> atlases = new List<Atlas>();
+        public ContentLoader()
+        {
+            int m = 3;
+        }
 
         public T LoadContent<T>(string contentName)
         {

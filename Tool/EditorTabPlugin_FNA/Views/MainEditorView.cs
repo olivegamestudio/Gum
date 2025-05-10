@@ -1,11 +1,13 @@
 ﻿using EditorTabPlugin_FNA.Services;
 using EditorTabPlugin_FNA.ViewModels;
 using EditorTabPlugin_XNA.Services;
+using Gum;
 using Gum.DataTypes;
 using Gum.Managers;
 using Gum.Plugins.InternalPlugins.EditorTab.Services;
 using Gum.Plugins.ScrollBarPlugin;
 using Gum.Wireframe;
+using Microsoft.Xna.Framework;
 using MonoGameGum;
 using MonoGameGum.Input;
 using RenderingLibrary;
@@ -17,6 +19,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Xml.Linq;
 
 namespace EditorTabPlugin_FNA.Views;
 public class MainEditorView : Grid
@@ -37,6 +40,7 @@ public class MainEditorView : Grid
     private readonly HotkeyManager _hotkeyManager;
     readonly ScrollbarService _scrollbarService;
     private ScrollBarControlLogic _scrollBarControlLogic;
+    private EditorGame _game;
 
     public SystemManagers SystemManagers { get; private set; } 
     #endregion
@@ -65,12 +69,12 @@ public class MainEditorView : Grid
         ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
 
 
-        var game = new EditorGame();
-
+        _game = new EditorGame(isDefault:true);
+        
 
         var fnaControl = new EditorWindow(
             _backgroundSpriteService,
-            game,
+            _game,
             _canvasBoundsService,
             _rulerService,
             _selectionManager,
@@ -80,14 +84,14 @@ public class MainEditorView : Grid
         _cursor = GumService.Default.Cursor;
         _keyboard = new Keyboard();
 
-        SystemManagers = game.SystemManagers;
+        SystemManagers = _game.SystemManagers;
 
-        _layerService.Initialize(game.SystemManagers);
-        _backgroundSpriteService.Initialize(game.SystemManagers);
-        _canvasBoundsService.Initialize(_layerService, game.SystemManagers);
-        _toolLayerService.Initialize(game.SystemManagers);
+        _layerService.Initialize(_game.SystemManagers);
+        _backgroundSpriteService.Initialize(_game.SystemManagers);
+        _canvasBoundsService.Initialize(_layerService, _game.SystemManagers);
+        _toolLayerService.Initialize(_game.SystemManagers);
         _rulerService.Initialize(_layerService,
-            game.SystemManagers,
+            _game.SystemManagers,
             _cursor,
             _keyboard,
             _toolFontService,
@@ -96,15 +100,15 @@ public class MainEditorView : Grid
 
         _selectionManager.Initialize(_layerService,
             _toolFontService,
-            game.SystemManagers,
+            _game.SystemManagers,
             _cursor);
 
 
         _cameraViewModel = new CameraViewModel(
-            game.SystemManagers.Renderer.Camera,
+            _game.SystemManagers.Renderer.Camera,
             _hotkeyManager,
             _cursor,
-            game.SystemManagers);
+            _game.SystemManagers);
 
         var bottomGrid = new Grid();
         bottomGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
@@ -112,7 +116,7 @@ public class MainEditorView : Grid
         this.Children.Add(bottomGrid);
         Grid.SetRow(bottomGrid, 1);
 
-        InitializeScrollBars(game, bottomGrid, fnaControl);
+        InitializeScrollBars(_game, bottomGrid, fnaControl);
 
         InitializeZoomComboBox(bottomGrid);
 
@@ -122,6 +126,16 @@ public class MainEditorView : Grid
 
         _scrollbarService.HandleXnaInitialized();
 
+        _game.Updated += HandleGameUpdated;
+
+    }
+
+    private void HandleGameUpdated(GameTime time)
+    {
+        _game.ClearColor = new Microsoft.Xna.Framework.Color(
+        ProjectManager.Self.GeneralSettingsFile.CheckerColor1R,
+                ProjectManager.Self.GeneralSettingsFile.CheckerColor1G,
+                ProjectManager.Self.GeneralSettingsFile.CheckerColor1B);
     }
 
     private void InitializeZoomComboBox(Grid bottomGrid)

@@ -30,7 +30,7 @@ namespace Gum.Managers
             var directory = Path.GetDirectoryName(executingPath);
 
             var fntFilePath = Path.Combine(directory, "Content/Fonts/Font18Arial_o1.fnt");
-            var font = new BitmapFont(fntFilePath, systemManagers);
+            var font = new BitmapFont(fntFilePath);
 
             _toolFont = font;
         }

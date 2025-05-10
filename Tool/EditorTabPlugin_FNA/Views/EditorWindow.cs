@@ -36,8 +36,9 @@ internal class EditorWindow : FnaControl
         RulerService rulerService,
         SelectionManager selectionManager,
         WindowsCursorLogic windowsCursorLogic
-        ) : base(game)
+        )
     {
+        InitializeWithGame(game);
         _game = game;
         _backgroundSpriteService = backgroundSpriteService;
         _canvasBoundsService = canvasBoundsService;

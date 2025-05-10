@@ -243,7 +243,9 @@ namespace RenderingLibrary
             if(fullInstantiation)
             {
 #if USE_GUMCOMMON
-                LoaderManager.Self.ContentLoader = new ContentLoader();
+                var contentLoader = new ContentLoader();
+                contentLoader.SystemManagers = this;
+                LoaderManager.Self.ContentLoader = contentLoader;
 
                 var assembly = typeof(SystemManagers).Assembly;
 #if KNI
@@ -317,7 +319,7 @@ namespace RenderingLibrary
 
             ElementSaveExtensions.RegisterGueInstantiation(
                 "Rectangle",
-                () => new RectangleRuntime());
+                () => new RectangleRuntime(systemManagers:this));
 
             ElementSaveExtensions.RegisterGueInstantiation(
                 "Sprite",

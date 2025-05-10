@@ -96,7 +96,7 @@ namespace Gum.Wireframe.Editors
             mResizeHandles.ShowOrigin = true;
             mResizeHandles.Visible = false;
 
-            rotationHandle = new LineCircle();
+            rotationHandle = new LineCircle(systemManagers);
             rotationHandle.Color = Color.Yellow;
             systemManagers.ShapeManager.Add(rotationHandle, layer);
             rotationHandle.Visible = false;
@@ -326,7 +326,7 @@ namespace Gum.Wireframe.Editors
                 rotationHandle.Visible = true;
 
                 // right side
-                float minimumOffset = 24 / Renderer.Self.Camera.Zoom;
+                float minimumOffset = 24 / _systemManagers.Renderer.Camera.Zoom;
 
 
                 float xOffset = 0;
@@ -357,7 +357,7 @@ namespace Gum.Wireframe.Editors
                 // consider the Y
                 rotationHandle.Y = singleSelectedObject.AbsoluteY + offset.Y;
 
-                rotationHandle.Radius = 8 / Renderer.Self.Camera.Zoom;
+                rotationHandle.Radius = 8 / _systemManagers.Renderer.Camera.Zoom;
             }
         }
 
@@ -420,8 +420,8 @@ namespace Gum.Wireframe.Editors
 
         private void SideGrabbingActivity()
         {
-            float cursorXChange = GumService.Default.Cursor.XChange / Renderer.Self.Camera.Zoom;
-            float cursorYChange = GumService.Default.Cursor.YChange / Renderer.Self.Camera.Zoom;
+            float cursorXChange = GumService.Default.Cursor.XChange / _systemManagers.Renderer.Camera.Zoom;
+            float cursorYChange = GumService.Default.Cursor.YChange / _systemManagers.Renderer.Camera.Zoom;
 
             ////////////////////////////////EARLY OUT//////////////////////////////////////
             if (cursorXChange == 0 && cursorYChange == 0)
