@@ -57,7 +57,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EditorTabPlugins", "EditorT
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EditorTabPlugin_XNA", "Tool\EditorTabPlugin_XNA\EditorTabPlugin_XNA.csproj", "{F4A5BB2F-1650-4099-9FFE-1C4A416D4438}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EditorTabPlugin_FNA", "Tool\FnaTest1\EditorTabPlugin_FNA.csproj", "{D05AB3BC-C285-4420-8FFE-CD1D1BD60210}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EditorTabPlugin_FNA", "Tool\EditorTabPlugin_FNA\EditorTabPlugin_FNA.csproj", "{D05AB3BC-C285-4420-8FFE-CD1D1BD60210}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FnaGumNetFramework", "MonoGameGum\FnaGumNetFramework\FnaGumNetFramework.csproj", "{885D4174-C47C-41D0-87F6-24A53AAFAF36}"
 EndProject
