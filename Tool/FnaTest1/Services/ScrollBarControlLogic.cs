@@ -23,7 +23,6 @@ namespace Gum.Wireframe
 
         float zoomPercentage = 100;
 
-        System.Windows.Controls.Panel mParent;
         FrameworkElement xnaControl;
 
         #endregion
@@ -68,33 +67,19 @@ namespace Gum.Wireframe
 
         }
 
-        public void Initialize(System.Windows.Controls.Panel parent, FrameworkElement xnaControl, SystemManagers managers)
+        public void Initialize(ScrollBar verticalScrollBar, ScrollBar horizontalScrollBar, FrameworkElement xnaControl, SystemManagers managers)
         {
-            mParent = parent;
             this.xnaControl = xnaControl;
 
-            mVerticalScrollBar = new();
-            mVerticalScrollBar.Orientation = System.Windows.Controls.Orientation.Vertical;
-            //mVerticalScrollBar.Dock = DockStyle.Right;
-            //mVerticalScrollBar.Scroll += HandleVerticalScroll;
+            mVerticalScrollBar = verticalScrollBar;
             mVerticalScrollBar.ValueChanged += HandleVerticalScroll;
-            Grid.SetRow(mVerticalScrollBar, 0);
-            Grid.SetColumn(mVerticalScrollBar, 1);
 
-            parent.Children.Add(mVerticalScrollBar);
-
-            mHorizontalScrollBar = new ScrollBar();
-            //mHorizontalScrollBar.Dock = DockStyle.Bottom;
-
+            mHorizontalScrollBar = horizontalScrollBar;
             mHorizontalScrollBar.ValueChanged += HandleHorizontalScroll;
-            mHorizontalScrollBar.Orientation = Orientation.Horizontal;
-            Grid.SetRow(mHorizontalScrollBar, 1);
-            Grid.SetColumn(mHorizontalScrollBar, 0);
-            parent.Children.Add(mHorizontalScrollBar);
 
             SetDisplayedArea(2048, 2048);
 
-            //xnaControl.Resize += HandlePanelResize;
+            xnaControl.SizeChanged += HandlePanelResize;
             this.managers = managers;
         }
         

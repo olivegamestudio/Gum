@@ -15,10 +15,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 
 namespace EditorTabPlugin_FNA.Views;
 public class MainEditorView : Grid
 {
+    #region Fields/Properties
+
     private Cursor _cursor;
     private Keyboard _keyboard;
     private LayerService _layerService;
@@ -33,6 +36,8 @@ public class MainEditorView : Grid
     private readonly HotkeyManager _hotkeyManager;
     readonly ScrollbarService _scrollbarService;
     private ScrollBarControlLogic _scrollBarControlLogic;
+
+    #endregion
 
     public MainEditorView(
         LayerService layerService, 
@@ -51,18 +56,18 @@ public class MainEditorView : Grid
         _selectionManager = selectionManager;
         _hotkeyManager = Gum.Services.Builder.Get<HotkeyManager>();
 
-        RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) } );
+        RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) });
         RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
 
         ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
-        ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto});
+        ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
 
 
         var game = new EditorGame();
 
 
         var fnaControl = new EditorWindow(
-            _backgroundSpriteService, 
+            _backgroundSpriteService,
             game,
             _canvasBoundsService,
             _rulerService,
@@ -87,26 +92,63 @@ public class MainEditorView : Grid
 
         _selectionManager.Initialize(_layerService,
             _toolFontService,
-            game.SystemManagers, 
+            game.SystemManagers,
             _cursor);
 
 
         _cameraViewModel = new CameraViewModel(
-            game.SystemManagers.Renderer.Camera, 
+            game.SystemManagers.Renderer.Camera,
             _hotkeyManager,
             _cursor,
             game.SystemManagers);
 
+        var bottomGrid = new Grid();
+        bottomGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto });
+        bottomGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
+        this.Children.Add(bottomGrid);
+        Grid.SetRow(bottomGrid, 1);
 
+        InitializeScrollBars(game, bottomGrid, fnaControl);
 
+        InitializeZoomComboBox(bottomGrid);
 
-        _scrollBarControlLogic.Initialize(this, fnaControl, game.SystemManagers);
         fnaControl.KeyDownWinforms += HandleKeyDownWinforms;
 
         fnaControl.DataContext = _cameraViewModel;
 
         _scrollbarService.HandleXnaInitialized();
 
+    }
+
+    private void InitializeZoomComboBox(Grid bottomGrid)
+    {
+        var comboBox = new ComboBox();
+
+        comboBox.DataContext = _cameraViewModel;
+
+        comboBox.SetBinding(ComboBox.SelectedIndexProperty, nameof(_cameraViewModel.SelectedZoomIndex));
+        comboBox.SetBinding(ComboBox.ItemsSourceProperty, nameof(_cameraViewModel.AvailableZoomLevels));
+
+        bottomGrid.Children.Add(comboBox);
+    }
+
+    private void InitializeScrollBars(EditorGame game, Grid bottomGrid, EditorWindow fnaControl)
+    {
+        var verticalScrollBar = new ScrollBar();
+        verticalScrollBar.Orientation = System.Windows.Controls.Orientation.Vertical;
+
+        var horizontalScrollBar = new ScrollBar();
+        horizontalScrollBar.Orientation = Orientation.Horizontal;
+
+        Grid.SetRow(verticalScrollBar, 0);
+        Grid.SetColumn(verticalScrollBar, 1);
+        this.Children.Add(verticalScrollBar);
+
+        Grid.SetColumn(horizontalScrollBar, 1);
+        bottomGrid.Children.Add(horizontalScrollBar);
+
+
+        _scrollBarControlLogic.Initialize(verticalScrollBar, horizontalScrollBar, fnaControl, game.SystemManagers);
     }
 
     public void HandleElementSelected(ElementSave elementSave)

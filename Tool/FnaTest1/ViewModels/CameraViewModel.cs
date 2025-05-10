@@ -14,14 +14,14 @@ using System.Threading.Tasks;
 namespace EditorTabPlugin_FNA.ViewModels;
 public class CameraViewModel : ViewModel
 {
-    List<int> _availableZoomLevels = new List<int>();
+    List<ZoomLevel> _availableZoomLevels = new List<ZoomLevel>();
     private readonly Camera _camera;
     private readonly SystemManagers _systemManagers;
     private readonly HotkeyManager _hotkeyManager;
     Microsoft.Xna.Framework.Point mLastMouseLocation;
     Cursor _cursor;
 
-    public List<int> AvailableZoomLevels =>
+    public List<ZoomLevel> AvailableZoomLevels =>
         _availableZoomLevels;
 
     public int SelectedZoomIndex
@@ -34,7 +34,7 @@ public class CameraViewModel : ViewModel
             {
                 var zoomLevel = _availableZoomLevels[value];
 
-                _camera.Zoom = zoomLevel / 100f;
+                _camera.Zoom = zoomLevel.Value / 100f;
 
                 PluginManager.Self.CameraChanged();
             }
@@ -53,35 +53,36 @@ public class CameraViewModel : ViewModel
         _cursor = cursor;
         _hotkeyManager = hotkeyManager;
 
-        _availableZoomLevels.Add(1600);
-        _availableZoomLevels.Add(1200);
-        _availableZoomLevels.Add(1000);
-        _availableZoomLevels.Add(800);
-        _availableZoomLevels.Add(700);
-        _availableZoomLevels.Add(600);
-        _availableZoomLevels.Add(500);
-        _availableZoomLevels.Add(400);
-        _availableZoomLevels.Add(350);
-        _availableZoomLevels.Add(300);
-        _availableZoomLevels.Add(250);
-        _availableZoomLevels.Add(200);
-        _availableZoomLevels.Add(175);
-        _availableZoomLevels.Add(150);
-        _availableZoomLevels.Add(125);
-        _availableZoomLevels.Add(100);
-        _availableZoomLevels.Add(87);
-        _availableZoomLevels.Add(75);
-        _availableZoomLevels.Add(63);
-        _availableZoomLevels.Add(50);
-        _availableZoomLevels.Add(33);
-        _availableZoomLevels.Add(25);
-        _availableZoomLevels.Add(10);
-        _availableZoomLevels.Add(5);
+        _availableZoomLevels.Add(new (1600));
+        _availableZoomLevels.Add(new (1200));
+        _availableZoomLevels.Add(new (1000));
+        _availableZoomLevels.Add(new (800));
+        _availableZoomLevels.Add(new (700));
+        _availableZoomLevels.Add(new (600));
+        _availableZoomLevels.Add(new (500));
+        _availableZoomLevels.Add(new (400));
+        _availableZoomLevels.Add(new (350));
+        _availableZoomLevels.Add(new (300));
+        _availableZoomLevels.Add(new (250));
+        _availableZoomLevels.Add(new (200));
+        _availableZoomLevels.Add(new (175));
+        _availableZoomLevels.Add(new (150));
+        _availableZoomLevels.Add(new (125));
+        var _100Zoom = new ZoomLevel(100);
+        _availableZoomLevels.Add(_100Zoom);
+        _availableZoomLevels.Add(new (87));
+        _availableZoomLevels.Add(new (75));
+        _availableZoomLevels.Add(new (63));
+        _availableZoomLevels.Add(new (50));
+        _availableZoomLevels.Add(new (33));
+        _availableZoomLevels.Add(new (25));
+        _availableZoomLevels.Add(new (10));
+        _availableZoomLevels.Add(new (5));
 
         //SelectedZoomIndex = _availableZoomLevels.IndexOf(100);
         // Don't set the property because doing so raises plugin events
         // but the plugin system isn't yet running:
-        Set(_availableZoomLevels.IndexOf(100), nameof(SelectedZoomIndex));
+        Set(_availableZoomLevels.IndexOf(_100Zoom), nameof(SelectedZoomIndex));
     }
 
 
@@ -209,4 +210,16 @@ public class CameraViewModel : ViewModel
             mLastMouseLocation = newPosition;
         }
     }
+}
+
+public class ZoomLevel
+{
+    public int Value { get; set; }
+
+    public ZoomLevel(int value)
+    {
+        Value = value;
+    }
+
+    public override string ToString() => $"{Value}%";
 }
