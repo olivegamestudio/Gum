@@ -98,7 +98,7 @@ internal class EditorWindow : FnaControl
 
     internal void HandleMouseWheel(int delta, Microsoft.Xna.Framework.Point position)
     {
-        ViewModel.HandleMouseWheel(delta, position);
+        ViewModel.HandleMouseWheel(delta);
     }
 
 

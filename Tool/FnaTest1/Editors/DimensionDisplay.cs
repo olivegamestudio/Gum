@@ -265,25 +265,33 @@ namespace Gum.Wireframe.Editors
             {
                 var camera = systemManagers.Renderer.Camera;
 
-                if (desiredPosition.X + dimensionDisplayText.WrappedTextWidth > camera.AbsoluteRight)
+                var width = camera.AbsoluteRight - camera.AbsoluteLeft;
+                var height = camera.AbsoluteBottom - camera.AbsoluteTop;
+
+                var absoluteRight = camera.AbsoluteRight - width/2f;
+                var absoluteLeft = camera.AbsoluteLeft - width / 2f;
+                var absoluteTop = camera.AbsoluteTop - height / 2f;
+                var absoluteBottom = camera.AbsoluteBottom - height / 2f;
+
+                if (desiredPosition.X + dimensionDisplayText.WrappedTextWidth > absoluteRight)
                 {
-                    desiredPosition.X = camera.AbsoluteRight - dimensionDisplayText.WrappedTextWidth;
+                    desiredPosition.X = absoluteRight - dimensionDisplayText.WrappedTextWidth;
                 }
 
                 const float rulerPadding = 12;
 
-                if (desiredPosition.X < camera.AbsoluteLeft + rulerPadding)
+                if (desiredPosition.X < absoluteLeft + rulerPadding)
                 {
-                    desiredPosition.X = camera.AbsoluteLeft + rulerPadding;
+                    desiredPosition.X = absoluteLeft + rulerPadding;
                 }
 
-                if (desiredPosition.Y < camera.AbsoluteTop + rulerPadding)
+                if (desiredPosition.Y < absoluteTop + rulerPadding)
                 {
-                    desiredPosition.Y = camera.AbsoluteTop + rulerPadding;
+                    desiredPosition.Y = absoluteTop + rulerPadding;
                 }
-                if (desiredPosition.Y + dimensionDisplayText.WrappedTextHeight > camera.AbsoluteBottom)
+                if (desiredPosition.Y + dimensionDisplayText.WrappedTextHeight > absoluteBottom)
                 {
-                    desiredPosition.Y = camera.AbsoluteBottom - dimensionDisplayText.WrappedTextHeight;
+                    desiredPosition.Y = absoluteBottom - dimensionDisplayText.WrappedTextHeight;
                 }
 
                 return desiredPosition;

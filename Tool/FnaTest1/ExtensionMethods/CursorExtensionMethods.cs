@@ -55,13 +55,10 @@ namespace InputLibrary
 
         public static float GetWorldX(this Cursor cursor, SystemManagers managers, Layer layer)
         {
-            if (cursor.PrimaryDown)
-            {
-                int m = 3;
-            }
+            var camera = managers.Renderer.Camera;
 
             Vector3 transformed = new Vector3(cursor.X, cursor.Y, 0);
-            Matrix matrix = managers.Renderer.Camera.GetTransformationMatrix();
+            Matrix matrix = camera.GetTransformationMatrix();
             Matrix.Invert(matrix, out matrix);
             TransformVector(ref transformed, ref matrix);
 
@@ -72,31 +69,27 @@ namespace InputLibrary
             }
             else
             {
-                return transformed.X - managers.Renderer.Camera.ClientWidth / 2.0f;
+                return transformed.X - camera.ClientWidth / (2.0f * camera.Zoom) ;
             }
-
-
-
         }
 
         public static float GetWorldY(this Cursor cursor, SystemManagers managers, Layer layer)
         {
-            Vector3 transformed = new Vector3(cursor.X, cursor.Y, 0);
-            Matrix matrix = managers.Renderer.Camera.GetTransformationMatrix();
-            Matrix.Invert(matrix, out matrix);
+            var camera = managers.Renderer.Camera;
 
+            Vector3 transformed = new Vector3(cursor.X, cursor.Y, 0);
+            Matrix matrix = camera.GetTransformationMatrix();
+            Matrix.Invert(matrix, out matrix);
             TransformVector(ref transformed, ref matrix);
+
             if (layer?.LayerCameraSettings?.IsInScreenSpace == true)
             {
                 return transformed.Y;
-
             }
             else
             {
-                return transformed.Y - managers.Renderer.Camera.ClientHeight / 2.0f;
+                return transformed.Y - camera.ClientHeight / (2.0f * camera.Zoom);
             }
-
-
         }
     }
 }

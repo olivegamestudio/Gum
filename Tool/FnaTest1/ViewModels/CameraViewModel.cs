@@ -1,6 +1,9 @@
 ﻿using Gum.Managers;
 using Gum.Mvvm;
 using Gum.Plugins;
+using InputLibrary;
+using MonoGameGum;
+using MonoGameGum.Input;
 using RenderingLibrary;
 using System;
 using System.Collections.Generic;
@@ -12,9 +15,11 @@ namespace EditorTabPlugin_FNA.ViewModels;
 public class CameraViewModel : ViewModel
 {
     List<int> _availableZoomLevels = new List<int>();
-    Camera _camera;
+    private readonly Camera _camera;
+    private readonly SystemManagers _systemManagers;
     private readonly HotkeyManager _hotkeyManager;
     Microsoft.Xna.Framework.Point mLastMouseLocation;
+    Cursor _cursor;
 
     public List<int> AvailableZoomLevels =>
         _availableZoomLevels;
@@ -36,9 +41,16 @@ public class CameraViewModel : ViewModel
         }
     }
 
-    public CameraViewModel(Camera camera, HotkeyManager hotkeyManager)
+    public CameraViewModel(
+        Camera camera, 
+        HotkeyManager hotkeyManager, 
+        Cursor cursor,
+        SystemManagers systemManagers
+        )
     {
+        _systemManagers = systemManagers;
         _camera = camera;
+        _cursor = cursor;
         _hotkeyManager = hotkeyManager;
 
         _availableZoomLevels.Add(1600);
@@ -142,10 +154,12 @@ public class CameraViewModel : ViewModel
         return false;
     }
 
-    internal void HandleMouseWheel(int delta, Microsoft.Xna.Framework.Point position)
+    internal void HandleMouseWheel(int delta)
     {
-        float worldX, worldY;
-        _camera.ScreenToWorld(position.X, position.Y, out worldX, out worldY);
+        float worldX = _cursor.GetWorldX(_systemManagers, null);
+        float worldY = _cursor.GetWorldY(_systemManagers, null);
+        //_camera.ScreenToWorld(position.X, position.Y, out worldX, out worldY);
+
         float differenceX = _camera.X - worldX;
         float differenceY = _camera.Y - worldY;
 

@@ -86,25 +86,14 @@ internal class MainEditorTabPlugin : PluginBase
         };
     #endregion
 
+    MainEditorView _mainEditorView;
 
-    readonly ScrollbarService _scrollbarService;
     private readonly GuiCommands _guiCommands;
     private readonly LocalizationManager _localizationManager;
     private readonly ScreenshotService _screenshotService;
     private readonly SelectionManager _selectionManager;
-    private readonly ElementCommands _elementCommands;
     private readonly SinglePixelTextureService _singlePixelTextureService;
-    private readonly HotkeyManager _hotkeyManager;
-    private BackgroundSpriteService _backgroundSpriteService;
-    private CanvasBoundsService _canvasBoundsService;
     private LayerService _layerService;
-    private ToolLayerService _toolLayerService;
-    private ToolFontService _toolFontService;
-    private CameraViewModel _cameraViewModel;
-    private readonly RulerService _rulerService;
-    private Cursor _cursor;
-    private Keyboard _keyboard;
-    private ScrollBarControlLogic _scrollBarControlLogic;
     private readonly WindowsCursorLogic _windowsCursorLogic;
 
     private EditingManager _editingManager;
@@ -123,17 +112,9 @@ internal class MainEditorTabPlugin : PluginBase
             GumCommands.Self.GuiCommands,
             _windowsCursorLogic);
         _screenshotService = new ScreenshotService(_selectionManager);
-        _elementCommands = ElementCommands.Self;
         _singlePixelTextureService = new SinglePixelTextureService();
-        _hotkeyManager = Gum.Services.Builder.Get<HotkeyManager>();
-        _backgroundSpriteService = new BackgroundSpriteService();
-        _canvasBoundsService = new CanvasBoundsService();
         _layerService = new LayerService();
-        _rulerService = new RulerService();
-        _toolLayerService = new ToolLayerService();
-        _toolFontService = new ToolFontService();
-        _scrollBarControlLogic = new ScrollBarControlLogic();
-        _scrollbarService = new ScrollbarService(_scrollBarControlLogic);
+
     }
 
     public override bool ShutDown(PluginShutDownReason shutDownReason)
@@ -150,64 +131,12 @@ internal class MainEditorTabPlugin : PluginBase
         //GraphicalUiElement.AddRenderableToManagers = CustomSetPropertyOnRenderable.AddRenderableToManagers;
         //GraphicalUiElement.RemoveRenderableFromManagers = CustomSetPropertyOnRenderable.RemoveRenderableFromManagers;
 
+        _mainEditorView = new MainEditorView(_layerService, _windowsCursorLogic, _selectionManager);
+
+        // assign events *after* creating the main editor view, because the main editor view handles some of the events
         AssignEvents();
-
-        var grid = new Grid();
-        grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) } );
-        grid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
-
-        grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
-        grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto});
-
-        var game = new EditorGame();
-        // Initialized has to be assigned before creating the fna control or else it won't
-        // get called
-        game.Initialized += () =>
-        {
-            _cursor = GumService.Default.Cursor;
-            _keyboard = new Keyboard();
-
-            _layerService.Initialize();
-            _backgroundSpriteService.Initialize(game.SystemManagers);
-            _canvasBoundsService.Initialize(_layerService);
-            _toolLayerService.Initialize(game.SystemManagers);
-            _rulerService.Initialize(_layerService,
-                game.SystemManagers,
-                _cursor,
-                _keyboard,
-                _toolFontService,
-                _toolLayerService,
-                _windowsCursorLogic);
-
-            _selectionManager.Initialize(_layerService,
-                _toolFontService,
-                game.SystemManagers, 
-                _cursor);
-
-
-        };
-
-        var fnaControl = new EditorWindow(
-            _backgroundSpriteService, 
-            game,
-            _canvasBoundsService,
-            _rulerService,
-            _selectionManager,
-            _windowsCursorLogic);
-
-
-        grid.Children.Add(fnaControl);
-
-        _cameraViewModel = new CameraViewModel(game.SystemManagers.Renderer.Camera, _hotkeyManager);
-
-        _scrollBarControlLogic.Initialize(grid, fnaControl, game.SystemManagers);
-        fnaControl.KeyDownWinforms += HandleKeyDownWinforms;
-
-        fnaControl.DataContext = _cameraViewModel;
-
-        //fnaControl.KeyDown += OnKeyDown;
-
-        var tab = this.CreateTab(grid, "FNA test");
+        
+        var tab = this.CreateTab(_mainEditorView, "Editor");
         tab.SuggestedLocation = TabLocation.RightTop;
         tab.Show();
 
@@ -216,37 +145,10 @@ internal class MainEditorTabPlugin : PluginBase
         //var tab = GumCommands.Self.GuiCommands.AddControl(fnaControl, "Fna Test");
     }
 
-    private void HandleKeyDownWinforms(object arg1, System.Windows.Forms.KeyEventArgs args)
-    {
-        var msg = new System.Windows.Forms.Message();
-        bool handled = _hotkeyManager.ProcessCmdKeyWireframe(ref msg, args.KeyData);
 
-        if(!handled)
-        {
-            handled = _cameraViewModel.HandleKeyPress(args);
-        }
-
-        if(!handled)
-        {
-            _hotkeyManager.HandleKeyDownWireframe(args);
-        }
-
-        args.Handled = handled;
-    }
-
-    //void OnKeyDown(object sender, KeyEventArgs e)
-    //{
-    //    HotkeyManager.Self.HandleKeyDownWireframe(e);
-    //    _cameraController.HandleKeyPress(e);
-
-    //}
 
     private void HandleXnaInitialized()
     {
-        //_scrollbarService.HandleWireframeInitialized(_wireframeControl, gumEditorPanel);
-
-
-
         //_wireframeEditControl.ZoomChanged += HandleControlZoomChange;
 
         //_wireframeControl.Initialize(_wireframeEditControl, gumEditorPanel, HotkeyManager.Self, _selectionManager);
@@ -259,7 +161,6 @@ internal class MainEditorTabPlugin : PluginBase
 
 
 
-        _scrollbarService.HandleXnaInitialized();
 
 
         //this._wireframeControl.Parent.Resize += (not, used) =>
@@ -285,11 +186,6 @@ internal class MainEditorTabPlugin : PluginBase
         //{
         //    args.Action = DragAction.Continue;
         //};
-        //_wireframeControl.CameraChanged += () =>
-        //{
-        //    PluginManager.Self.CameraChanged();
-        //};
-
         //this._wireframeControl.KeyDown += (o, args) =>
         //{
         //    if (args.KeyCode == Keys.Tab)
@@ -316,7 +212,6 @@ internal class MainEditorTabPlugin : PluginBase
         this.InstanceDelete += HandleInstanceDelete;
 
         this.ElementSelected += HandleElementSelected;
-        this.ElementSelected += _scrollbarService.HandleElementSelected;
         this.ElementDelete += HandleElementDeleted;
 
         this.VariableSet += HandleVariableSet;
@@ -327,18 +222,16 @@ internal class MainEditorTabPlugin : PluginBase
 
         this.StateDelete += HandleStateDelete;
 
-        this.CameraChanged += _scrollbarService.HandleCameraChanged;
+        this.CameraChanged += _mainEditorView.HandleCameraChanged;
 
         // This may not be needed anymore:
         //this.XnaInitialized += HandleXnaInitialized;
 
-        this.WireframeResized += _scrollbarService.HandleWireframeResized;
         this.WireframeRefreshed += HandleWireframeRefreshed;
         this.WireframePropertyChanged += HandleWireframePropertyChanged;
 
         this.UiZoomValueChanged += HandleUiZoomValueChanged;
 
-        this.GuidesChanged += HandleGuidesChanged;
 
         this.IpsoSelected += HandleIpsoSelected;
         this.SetHighlightedIpso += HandleSetHighlightedElement;
@@ -350,6 +243,10 @@ internal class MainEditorTabPlugin : PluginBase
         this.GetSelectedIpsos += HandleGetSelectedIpsos;
 
         this.AfterUndo += HandleAfterUndo;
+
+        this.ElementSelected += _mainEditorView.HandleElementSelected;
+        this.WireframeResized += _mainEditorView.HandleWireframeResized;
+        this.GuidesChanged += _mainEditorView.HandleGuidesChanged;
     }
 
     private void HandleProjectLoad(GumProjectSave save)
@@ -466,11 +363,6 @@ internal class MainEditorTabPlugin : PluginBase
         //_wireframeEditControl.Height = _defaultWireframeEditControlHeight * _guiCommands.UiZoomValue / 100;
     }
 
-    private void HandleGuidesChanged()
-    {
-        _rulerService.RefreshGuides();
-        //_wireframeControl.RefreshGuides();
-    }
 
     private void HandleWireframePropertyChanged(string name)
     {
