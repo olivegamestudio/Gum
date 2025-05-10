@@ -50,6 +50,7 @@ namespace Gum.Wireframe
 
 
         const float WidthAtNoZoom = 12;
+        private readonly SystemManagers _systemManagers;
 
         #endregion
 
@@ -123,25 +124,26 @@ namespace Gum.Wireframe
 
         #region Methods
 
-        public ResizeHandles(Layer layer, Color color)
+        public ResizeHandles(Layer layer, Color color, SystemManagers systemManagers)
         {
+            _systemManagers = systemManagers;
             for (int i = 0; i < mHandles.Length; i++)
             {
-                mHandles[i] = new LineRectangle();
+                mHandles[i] = new LineRectangle(systemManagers);
                 mHandles[i].IsDotted = false;
                 mHandles[i].Width = WidthAtNoZoom;
                 mHandles[i].Height = WidthAtNoZoom;
-                ShapeManager.Self.Add(mHandles[i], layer);
+                systemManagers.ShapeManager.Add(mHandles[i], layer);
 
-                mInnerHandles[i] = new LineRectangle();
+                mInnerHandles[i] = new LineRectangle(systemManagers);
                 mInnerHandles[i].IsDotted = false;
                 mInnerHandles[i].Width = WidthAtNoZoom - 2;
                 mInnerHandles[i].Height = WidthAtNoZoom - 2;
                 mInnerHandles[i].Color = Color.Black;
-                ShapeManager.Self.Add(mInnerHandles[i], layer);
+                systemManagers.ShapeManager.Add(mInnerHandles[i], layer);
             }
 
-            originDisplay = new OriginDisplay(layer);
+            originDisplay = new OriginDisplay(layer, systemManagers);
             originDisplay.SetColor(color);
             Visible = true;
             UpdateToProperties();
@@ -151,8 +153,8 @@ namespace Gum.Wireframe
         {
             for (int i = 0; i < mHandles.Length; i++)
             {
-                ShapeManager.Self.Remove(mHandles[i]);
-                ShapeManager.Self.Remove(mInnerHandles[i]);
+                _systemManagers.ShapeManager.Remove(mHandles[i]);
+                _systemManagers.ShapeManager.Remove(mInnerHandles[i]);
             }
 
             originDisplay.Destroy();
@@ -243,19 +245,19 @@ namespace Gum.Wireframe
         {
             foreach (var handle in this.mHandles)
             {
-                handle.Width = WidthAtNoZoom / Renderer.Self.Camera.Zoom;
-                handle.Height = WidthAtNoZoom / Renderer.Self.Camera.Zoom;
+                handle.Width = WidthAtNoZoom / _systemManagers.Renderer.Camera.Zoom;
+                handle.Height = WidthAtNoZoom / _systemManagers.Renderer.Camera.Zoom;
             }
             foreach(var innerHandle in mInnerHandles)
             {
-                innerHandle.Width = (WidthAtNoZoom-2) / Renderer.Self.Camera.Zoom;
-                innerHandle.Height = (WidthAtNoZoom-2) / Renderer.Self.Camera.Zoom;
+                innerHandle.Width = (WidthAtNoZoom-2) / _systemManagers.Renderer.Camera.Zoom;
+                innerHandle.Height = (WidthAtNoZoom-2) / _systemManagers.Renderer.Camera.Zoom;
             }
         }
 
         private void UpdateToProperties()
         {
-            var dim = WidthAtNoZoom / Renderer.Self.Camera.Zoom;
+            var dim = WidthAtNoZoom / _systemManagers.Renderer.Camera.Zoom;
             var halflDim = dim / 2.0f;
 
             mHandles[0].X = 0 - dim;
@@ -300,8 +302,8 @@ namespace Gum.Wireframe
 
                 var innerHandlePosition = new Vector3( handle.Position, 0);
                 // shift 1 pixel
-                innerHandlePosition += rotationMatrix.Right() / Renderer.Self.Camera.Zoom;
-                innerHandlePosition += rotationMatrix.Up() / Renderer.Self.Camera.Zoom;
+                innerHandlePosition += rotationMatrix.Right() / _systemManagers.Renderer.Camera.Zoom;
+                innerHandlePosition += rotationMatrix.Up() / _systemManagers.Renderer.Camera.Zoom;
                 innerHandle.Position.X = innerHandlePosition.X;
                 innerHandle.Position.Y = innerHandlePosition.Y;
 

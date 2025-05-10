@@ -21,7 +21,7 @@ internal class BackgroundSpriteService
     public void Initialize(SystemManagers systemManagers)
     {
         // Create the Texture2D here
-        ImageData imageData = new ImageData(2, 2, null);
+        ImageData imageData = new ImageData(2, 2, systemManagers);
 
         Microsoft.Xna.Framework.Color opaqueColor = Microsoft.Xna.Framework.Color.White;
         Microsoft.Xna.Framework.Color transparent = new Microsoft.Xna.Framework.Color(0, 0, 0, 0);
@@ -58,7 +58,7 @@ internal class BackgroundSpriteService
         BackgroundSprite.Wrap = true;
         int timesToRepeat = 256;
         BackgroundSprite.SourceRectangle =
-        new System.Drawing.Rectangle(0, 0, timesToRepeat * texture.Width, timesToRepeat * texture.Height);
+            new System.Drawing.Rectangle(0, 0, timesToRepeat * texture.Width, timesToRepeat * texture.Height);
 
         systemManagers.SpriteManager.Add(BackgroundSprite);
     }

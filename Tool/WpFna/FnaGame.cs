@@ -1,16 +1,12 @@
-﻿using Gum.Plugins.InternalPlugins.EditorTab.Services;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using MonoGameGum;
-using MonoGameGum.GueDeriving;
 using System;
 using System.Collections.Generic;
 using System.Data.Odbc;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ToolsUtilities;
 
 namespace EditorTabPlugin_FNA.LibraryFiles;
 

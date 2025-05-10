@@ -1,5 +1,6 @@
 ﻿using Gum;
 using Gum.Plugins.InternalPlugins.EditorTab.Services;
+using RenderingLibrary;
 using RenderingLibrary.Math.Geometry;
 using System;
 using System.Collections.Generic;
@@ -27,16 +28,16 @@ internal class CanvasBoundsService
         get { return mCanvasBounds; }
     }
 
-    public void Initialize(LayerService layerService)
+    public void Initialize(LayerService layerService, SystemManagers systemManagers)
     {
-        mCanvasBounds = new LineRectangle();
+        mCanvasBounds = new LineRectangle(systemManagers);
         mCanvasBounds.IsDotted = true;
         mCanvasBounds.Name = "Gum Screen Bounds";
         mCanvasBounds.Width = 800;
         mCanvasBounds.Height = 600;
         mCanvasBounds.Color = ScreenBoundsColor;
 
-        ShapeManager.Self.Add(mCanvasBounds, layerService.OverlayLayer);
+        systemManagers.ShapeManager.Add(mCanvasBounds, layerService.OverlayLayer);
 
     }
 

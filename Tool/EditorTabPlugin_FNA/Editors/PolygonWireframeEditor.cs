@@ -89,7 +89,7 @@ namespace Gum.Wireframe.Editors
         {
             get
             {
-                return RadiusAtNoZoom * 2/ Renderer.Self.Camera.Zoom;
+                return RadiusAtNoZoom * 2/ _systemManagers.Renderer.Camera.Zoom;
             }
         }
 
@@ -104,7 +104,7 @@ namespace Gum.Wireframe.Editors
         #region Constructor/Update To
 
         public PolygonWireframeEditor(Layer layer, HotkeyManager hotkeyManager, SelectionManager selectionManager,
-            SystemManagers systemManagers) : base(hotkeyManager, selectionManager)
+            SystemManagers systemManagers) : base(hotkeyManager, selectionManager, systemManagers)
         {
             _systemManagers = systemManagers;
             if(addPointTexture == null)
@@ -121,7 +121,7 @@ namespace Gum.Wireframe.Editors
 
                 using (var stream = FileManager.GetStreamForFile(fileName))
                 {
-                    addPointTexture = Texture2D.FromStream(SystemManagers.Default.Renderer.GraphicsDevice,
+                    addPointTexture = Texture2D.FromStream(_systemManagers.Renderer.GraphicsDevice,
                         stream);
 
                     addPointTexture.Name = fileName;
@@ -133,15 +133,15 @@ namespace Gum.Wireframe.Editors
 
             addPointSprite = new Sprite(addPointTexture);
             addPointSprite.Name = "Add point sprite";
-            SpriteManager.Self.Add(addPointSprite, layer);
+            systemManagers.SpriteManager.Add(addPointSprite, layer);
 
-            selectedPointLineRectangle = new LineRectangle();
-            ShapeManager.Self.Add(selectedPointLineRectangle, layer);
+            selectedPointLineRectangle = new LineRectangle(systemManagers);
+            systemManagers.ShapeManager.Add(selectedPointLineRectangle, layer);
             selectedPointLineRectangle.Color = Color.Magenta;
             selectedPointLineRectangle.IsDotted = false;
             selectedPointLineRectangle.LinePixelWidth = 3;
 
-            originDisplay = new OriginDisplay(layer);
+            originDisplay = new OriginDisplay(layer, systemManagers);
         }
 
         public override void UpdateToSelection(ICollection<GraphicalUiElement> selectedObjects)
@@ -233,7 +233,7 @@ namespace Gum.Wireframe.Editors
 
             if(hasSelection)
             {
-                var zoom = Renderer.Self.Camera.Zoom;
+                var zoom = _systemManagers.Renderer.Camera.Zoom;
                 selectedPointLineRectangle.Width = NodeDisplayWidth + 6/zoom;
                 selectedPointLineRectangle.Height = NodeDisplayWidth + 6 / zoom;
 
@@ -258,7 +258,7 @@ namespace Gum.Wireframe.Editors
                 var worldX = GumService.Default.Cursor.GetWorldX(_systemManagers, layer);
                 var worldY = GumService.Default.Cursor.GetWorldY(_systemManagers, layer);
 
-                var zoom = Renderer.Self.Camera.Zoom;
+                var zoom = _systemManagers.Renderer.Camera.Zoom;
 
                 this.addPointSprite.Width = this.addPointSprite.Height = 16 / zoom;
 
@@ -436,7 +436,7 @@ namespace Gum.Wireframe.Editors
 
             var pointAtIndex = linePolygon.PointAt(grabbedIndex.Value);
 
-            var zoom = Renderer.Self.Camera.Zoom;
+            var zoom = _systemManagers.Renderer.Camera.Zoom;
 
             Matrix.Invert(linePolygon.GetAbsoluteRotationMatrix(), out Matrix rotationMatrix);
 
@@ -528,11 +528,11 @@ namespace Gum.Wireframe.Editors
         {
             for (int i = 0; i < pointNodes.Count; i++)
             {
-                ShapeManager.Self.Remove(pointNodes[i]);
+                _systemManagers.ShapeManager.Remove(pointNodes[i]);
             }
 
-            SpriteManager.Self.Remove(addPointSprite);
-            ShapeManager.Self.Remove(selectedPointLineRectangle);
+            _systemManagers.SpriteManager.Remove(addPointSprite);
+            _systemManagers.ShapeManager.Remove(selectedPointLineRectangle);
             originDisplay.Destroy();
         }
 
@@ -557,7 +557,7 @@ namespace Gum.Wireframe.Editors
 
         private int? GetIndexOver(float worldXAt, float worldYAt)
         {
-            var effectiveRadius = RadiusAtNoZoom / Renderer.Self.Camera.Zoom;
+            var effectiveRadius = RadiusAtNoZoom / _systemManagers.Renderer.Camera.Zoom;
             // consider zoom:
             float currentZoomRadius = effectiveRadius * effectiveRadius;
             for(int i = 0; i < pointNodes.Count; i++)

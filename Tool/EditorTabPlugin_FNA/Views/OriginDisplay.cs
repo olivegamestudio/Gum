@@ -19,6 +19,8 @@ namespace Gum.Wireframe
 
         Line mOriginLine;
 
+        SystemManagers _systemManagers;
+
         public bool Visible
         {
             get
@@ -34,28 +36,29 @@ namespace Gum.Wireframe
             }
         }
 
-        public OriginDisplay(Layer layer)
+        public OriginDisplay(Layer layer, SystemManagers systemManagers)
         {
+            _systemManagers = systemManagers;
 
-            mXLine1 = new Line(null);
-            mXLine2 = new Line(null);
+            mXLine1 = new Line(systemManagers);
+            mXLine2 = new Line(systemManagers);
             mXLine1.Name = "Resize Handle X Line 1";
             mXLine2.Name = "Resize Handle X Line 2";
 
-            ShapeManager.Self.Add(mXLine1, layer);
-            ShapeManager.Self.Add(mXLine2, layer);
+            systemManagers.ShapeManager.Add(mXLine1, layer);
+            systemManagers.ShapeManager.Add(mXLine2, layer);
 
-            mOriginLine = new Line(null);
+            mOriginLine = new Line(systemManagers);
             mOriginLine.Name = "Resize Handle Offset Line";
-            ShapeManager.Self.Add(mOriginLine, layer);
+            systemManagers.ShapeManager.Add(mOriginLine, layer);
 
         }
 
         public void Destroy()
         {
-            ShapeManager.Self.Remove(mXLine1);
-            ShapeManager.Self.Remove(mXLine2);
-            ShapeManager.Self.Remove(mOriginLine);
+            _systemManagers.ShapeManager.Remove(mXLine1);
+            _systemManagers.ShapeManager.Remove(mXLine2);
+            _systemManagers.ShapeManager.Remove(mOriginLine);
         }
 
         public void UpdateTo(GraphicalUiElement asGue)

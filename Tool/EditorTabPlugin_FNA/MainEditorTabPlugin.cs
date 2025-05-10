@@ -547,7 +547,7 @@ internal class MainEditorTabPlugin : PluginBase
 
     private IRenderableIpso? HandleCreateRenderableForType(string type)
     {
-        return RuntimeObjectCreator.TryHandleAsBaseType(type, SystemManagers.Default) as IRenderableIpso;
+        return RuntimeObjectCreator.TryHandleAsBaseType(type, _mainEditorView.SystemManagers) as IRenderableIpso;
     }
 
     private void HandleInstanceSelected(ElementSave element, InstanceSave instance)
@@ -582,8 +582,9 @@ internal class MainEditorTabPlugin : PluginBase
 
     private GraphicalUiElement? HandleCreateGraphicalUiElement(ElementSave elementSave)
     {
-        var toReturn = elementSave.ToGraphicalUiElement(SystemManagers.Default, addToManagers: false);
-        toReturn.AddToManagers(SystemManagers.Default, _layerService.MainEditorLayer);
+        var systemManagers = _mainEditorView.SystemManagers;
+        var toReturn = elementSave.ToGraphicalUiElement(systemManagers, addToManagers: false);
+        toReturn.AddToManagers(systemManagers, _layerService.MainEditorLayer);
         UpdateTextOutlines(toReturn);
         return toReturn;
     }

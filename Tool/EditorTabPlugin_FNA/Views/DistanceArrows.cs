@@ -67,8 +67,8 @@ namespace Gum.Wireframe
         public DistanceArrows(SystemManagers systemManagers, ToolFontService toolFontService, ToolLayerService toolLayerService)
         {
             _toolLayerService = toolLayerService;
-            Arrow1 = new Arrow();
-            Arrow2 = new Arrow();
+            Arrow1 = new Arrow(systemManagers);
+            Arrow2 = new Arrow(systemManagers);
 
             if(_toolLayerService.TopLayer == null)
             {
@@ -216,11 +216,11 @@ namespace Gum.Wireframe
         }
 
 
-        public Arrow()
+        public Arrow(SystemManagers systemManagers)
         {
-            this.endLine1 = new Line();
-            this.endLine2 = new Line();
-            this.body = new Line();
+            this.endLine1 = new Line(systemManagers);
+            this.endLine2 = new Line(systemManagers);
+            this.body = new Line(systemManagers);
         }
 
         public void AddToManagers(Layer layer)

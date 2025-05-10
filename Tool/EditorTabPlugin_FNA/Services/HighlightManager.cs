@@ -73,34 +73,34 @@ namespace Gum.Wireframe
             }
         }
 
-        public HighlightManager(Layer layer)
+        public HighlightManager(Layer layer, SystemManagers systemMangers)
         {
 
             mOverlaySolidRectangle = new SolidRectangle();
             mOverlaySolidRectangle.Name = "Overlay SolidRectangle";
             mOverlaySolidRectangle.Color = Color.LightGreen.WithAlpha(100);
             mOverlaySolidRectangle.Visible = false;
-            ShapeManager.Self.Add(mOverlaySolidRectangle, layer);
+            systemMangers.ShapeManager.Add(mOverlaySolidRectangle, layer);
 
             mOverlaySprite = new Sprite(null);
             mOverlaySprite.Name = "Overlay Sprite";
             mOverlaySprite.BlendState = BlendState.Additive;
             mOverlaySprite.Visible = false;
-            SpriteManager.Self.Add(mOverlaySprite, layer);
+            systemMangers.SpriteManager.Add(mOverlaySprite, layer);
 
             mOverlayNineSlice = new NineSlice();
             mOverlayNineSlice.Name = "Overlay NineSlice";
             mOverlayNineSlice.BlendState = BlendState.Additive;
             mOverlayNineSlice.Visible = false;
-            SpriteManager.Self.Add(mOverlayNineSlice, layer);
+            systemMangers.SpriteManager.Add(mOverlayNineSlice, layer);
 
-            mOverlayLinePolygon = new LinePolygon();
+            mOverlayLinePolygon = new LinePolygon(systemMangers);
             mOverlayLinePolygon.Name = "Overly LinePolygon";
             // polys are white by default so let's make it dark
             mOverlayLinePolygon.Color = Color.DarkGreen;
             mOverlayLinePolygon.IsDotted = true;
             mOverlayLinePolygon.Visible = false;
-            ShapeManager.Self.Add(mOverlayLinePolygon, layer);
+            systemMangers.ShapeManager.Add(mOverlayLinePolygon, layer);
 
         }
 

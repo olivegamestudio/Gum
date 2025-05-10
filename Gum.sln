@@ -61,6 +61,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EditorTabPlugin_FNA", "Tool
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FnaGumNetFramework", "MonoGameGum\FnaGumNetFramework\FnaGumNetFramework.csproj", "{885D4174-C47C-41D0-87F6-24A53AAFAF36}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpFna", "Tool\WpFna\WpFna.csproj", "{97EF294D-13C6-4C1C-B3B6-B444B88FC145}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -155,6 +157,10 @@ Global
 		{885D4174-C47C-41D0-87F6-24A53AAFAF36}.Debug|x86.Build.0 = Debug|Any CPU
 		{885D4174-C47C-41D0-87F6-24A53AAFAF36}.Release|x86.ActiveCfg = Release|Any CPU
 		{885D4174-C47C-41D0-87F6-24A53AAFAF36}.Release|x86.Build.0 = Release|Any CPU
+		{97EF294D-13C6-4C1C-B3B6-B444B88FC145}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{97EF294D-13C6-4C1C-B3B6-B444B88FC145}.Debug|x86.Build.0 = Debug|Any CPU
+		{97EF294D-13C6-4C1C-B3B6-B444B88FC145}.Release|x86.ActiveCfg = Release|Any CPU
+		{97EF294D-13C6-4C1C-B3B6-B444B88FC145}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -185,6 +191,7 @@ Global
 		{F4A5BB2F-1650-4099-9FFE-1C4A416D4438} = {3E451941-5A67-42CD-931E-5DB8C0666178}
 		{D05AB3BC-C285-4420-8FFE-CD1D1BD60210} = {3E451941-5A67-42CD-931E-5DB8C0666178}
 		{885D4174-C47C-41D0-87F6-24A53AAFAF36} = {C66AD07F-C683-4C24-8E6B-20638ACC3A25}
+		{97EF294D-13C6-4C1C-B3B6-B444B88FC145} = {C66AD07F-C683-4C24-8E6B-20638ACC3A25}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {691B2E2F-58CB-4FD2-8480-695E8DE0CCE2}

@@ -2,7 +2,6 @@
 //Use at your own risk. No warranty expressed or implied!
 
 using EditorTabPlugin_FNA.LibraryFiles;
-using Gum.Managers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using SDL3;

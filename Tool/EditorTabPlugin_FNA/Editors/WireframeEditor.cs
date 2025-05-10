@@ -26,6 +26,7 @@ public abstract class WireframeEditor
     protected HotkeyManager _hotkeyManager { get; private set; }
 
     private readonly SelectionManager _selectionManager;
+    private readonly SystemManagers _systemManagers;
     protected GrabbedState grabbedState = new GrabbedState();
 
     protected bool mHasChangedAnythingSinceLastPush = false;
@@ -41,10 +42,12 @@ public abstract class WireframeEditor
     public bool RestrictToUnitValues { get; set; }
 
     public WireframeEditor(global::Gum.Managers.HotkeyManager hotkeyManager,
-        SelectionManager selectionManager)
+        SelectionManager selectionManager,
+        SystemManagers systemManagers)
     {
         _hotkeyManager = hotkeyManager;
         _selectionManager = selectionManager;
+        _systemManagers = systemManagers;
     }
 
     public abstract void UpdateToSelection(ICollection<GraphicalUiElement> selectedObjects);
@@ -84,10 +87,10 @@ public abstract class WireframeEditor
     protected void ApplyCursorMovement(MonoGameGum.Input.Cursor cursor)
     {
         float xToMoveBy = IsXMovementEnabled 
-            ? cursor.XChange / Renderer.Self.Camera.Zoom
+            ? cursor.XChange / _systemManagers.Renderer.Camera.Zoom
             : 0;
         float yToMoveBy = IsYMovementEnabled
-            ? cursor.YChange / Renderer.Self.Camera.Zoom
+            ? cursor.YChange / _systemManagers.Renderer.Camera.Zoom
             : 0;
 
         var vector2 = new Vector2(xToMoveBy, yToMoveBy);

@@ -154,7 +154,7 @@ public class GumService
         ISystemManagers.Default = this.SystemManagers;
 #endif
         this.SystemManagers.Initialize(graphicsDevice, fullInstantiation: true);
-        FormsUtilities.InitializeDefaults();
+        FormsUtilities.InitializeDefaults(systemManagers:this.SystemManagers);
 
         Root.Width = 0;
         Root.WidthUnits = DimensionUnitType.RelativeToParent;

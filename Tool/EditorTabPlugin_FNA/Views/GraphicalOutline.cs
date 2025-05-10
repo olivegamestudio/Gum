@@ -16,6 +16,7 @@ namespace Gum.Wireframe
         List<LineRectangle> mHighlightRectangles = new List<LineRectangle>();
         GraphicalUiElement mHighlightedIpso;
         Layer mUiLayer;
+        private readonly SystemManagers _systemManagers;
         #endregion
 
         #region Properties
@@ -57,10 +58,11 @@ namespace Gum.Wireframe
 
         #region Methods
 
-        public GraphicalOutline(Layer uiLayer)
+        public GraphicalOutline(Layer uiLayer, SystemManagers systemManagers)
         {
             SelectionBorder = 2;
             mUiLayer = uiLayer;
+            _systemManagers = systemManagers;
         }
 
         public void UpdateHighlightElements()
@@ -142,7 +144,7 @@ namespace Gum.Wireframe
 
         private void SetLineRectangleAroundIpso(LineRectangle rectangle, IRenderableIpso pso)
         {
-            float adjustedSelectionBorder = SelectionBorder / Renderer.Self.Camera.Zoom;
+            float adjustedSelectionBorder = SelectionBorder / _systemManagers.Renderer.Camera.Zoom;
 
             rectangle.Visible = true;
 
@@ -202,7 +204,7 @@ namespace Gum.Wireframe
             else
             {
 
-                LineRectangle newRect = new LineRectangle();
+                LineRectangle newRect = new LineRectangle(_systemManagers);
                 newRect.IsDotted = true;
                 newRect.Name = "Highlight Rectangle";
                 newRect.Color = Color.Yellow;

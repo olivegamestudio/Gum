@@ -210,9 +210,9 @@ public class SelectionManager
 
         var overlayLayer = layerService.OverlayLayer;
 
-        mGraphicalOutline = new GraphicalOutline(overlayLayer);
+        mGraphicalOutline = new GraphicalOutline(overlayLayer, systemManagers);
 
-        highlightManager = new HighlightManager(overlayLayer);
+        highlightManager = new HighlightManager(overlayLayer, systemManagers);
 
     }
 

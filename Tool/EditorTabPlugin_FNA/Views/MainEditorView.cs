@@ -8,6 +8,7 @@ using Gum.Plugins.ScrollBarPlugin;
 using Gum.Wireframe;
 using MonoGameGum;
 using MonoGameGum.Input;
+using RenderingLibrary;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,6 +38,7 @@ public class MainEditorView : Grid
     readonly ScrollbarService _scrollbarService;
     private ScrollBarControlLogic _scrollBarControlLogic;
 
+    public SystemManagers SystemManagers { get; private set; } 
     #endregion
 
     public MainEditorView(
@@ -78,9 +80,11 @@ public class MainEditorView : Grid
         _cursor = GumService.Default.Cursor;
         _keyboard = new Keyboard();
 
-        _layerService.Initialize();
+        SystemManagers = game.SystemManagers;
+
+        _layerService.Initialize(game.SystemManagers);
         _backgroundSpriteService.Initialize(game.SystemManagers);
-        _canvasBoundsService.Initialize(_layerService);
+        _canvasBoundsService.Initialize(_layerService, game.SystemManagers);
         _toolLayerService.Initialize(game.SystemManagers);
         _rulerService.Initialize(_layerService,
             game.SystemManagers,

@@ -13,19 +13,26 @@ namespace PerformanceMeasurementPlugin.ViewModels
     {
         DispatcherTimer mTimer;
 
+        SystemManagers systemManagers;
+
         public int DrawCallCount
         {
             get
             {
-                if (SystemManagers.Default != null)
-                {
-                    // to do: need to replace this with proper calls
-                    return -1;
-                }
-                else
-                {
-                    return 0;
-                }
+                return 0;
+                //if(systemManagers == null)
+                //{
+                //    systemManagers = SystemManagers.Default;
+                //}
+                //if (systemManagers != null)
+                //{
+                //    // to do: need to replace this with proper calls
+                //    return -1;
+                //}
+                //else
+                //{
+                //    return 0;
+                //}
             }
         }
 

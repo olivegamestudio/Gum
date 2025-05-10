@@ -1,4 +1,5 @@
-﻿using RenderingLibrary.Graphics;
+﻿using RenderingLibrary;
+using RenderingLibrary.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,16 +18,17 @@ public class LayerService
     {
     }
 
-    public void Initialize()
+    public void Initialize(SystemManagers systemManagers)
     {
-        MainEditorLayer = Renderer.Self.AddLayer();
+        var renderer = systemManagers.Renderer;
+        MainEditorLayer = systemManagers.Renderer.AddLayer();
         MainEditorLayer.Name = "Main Editor Layer";
 
 
-        OverlayLayer = Renderer.Self.AddLayer();
+        OverlayLayer = renderer.AddLayer();
         OverlayLayer.Name = "Overlay Layer";
 
-        RulerLayer = Renderer.Self.AddLayer();
+        RulerLayer = renderer.AddLayer();
         RulerLayer.LayerCameraSettings = new LayerCameraSettings();
         RulerLayer.LayerCameraSettings.IsInScreenSpace = true;
         RulerLayer.Name = "Ruler Layer";

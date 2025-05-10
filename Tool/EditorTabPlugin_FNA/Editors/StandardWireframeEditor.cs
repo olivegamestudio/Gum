@@ -85,20 +85,20 @@ namespace Gum.Wireframe.Editors
             ToolFontService toolFontService,
             GuiCommands guiCommands,
             SystemManagers systemManagers)
-            : base(hotkeyManager, selectionManager)
+            : base(hotkeyManager, selectionManager, systemManagers)
         {
             _elementCommands = GumCommands.Self.ProjectCommands.ElementCommands;
             _selectionManager = selectionManager;
             _systemManagers = systemManagers;
             this.layer = layer;
 
-            mResizeHandles = new ResizeHandles(layer, lineColor);
+            mResizeHandles = new ResizeHandles(layer, lineColor, systemManagers);
             mResizeHandles.ShowOrigin = true;
             mResizeHandles.Visible = false;
 
             rotationHandle = new LineCircle();
             rotationHandle.Color = Color.Yellow;
-            ShapeManager.Self.Add(rotationHandle, layer);
+            systemManagers.ShapeManager.Add(rotationHandle, layer);
             rotationHandle.Visible = false;
 
             widthDimensionDisplay = new DimensionDisplay(toolFontService, guiCommands);
@@ -115,7 +115,7 @@ namespace Gum.Wireframe.Editors
         {
             mResizeHandles.Destroy();
 
-            ShapeManager.Self.Remove(rotationHandle);
+            _systemManagers.ShapeManager.Remove(rotationHandle);
 
             widthDimensionDisplay.Destroy();
             heightDimensionDisplay.Destroy();
