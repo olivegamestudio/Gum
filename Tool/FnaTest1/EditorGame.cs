@@ -16,15 +16,13 @@ using Gum;
 namespace EditorTabPlugin_FNA;
 internal class EditorGame : FnaGame
 {
-    private readonly CameraController _cameraController;
-
     public SystemManagers SystemManagers => Gum.SystemManagers;
 
     GumService Gum => GumService.Default;
 
-    public EditorGame(CameraController cameraController) : base ()
+    public EditorGame() : base ()
     {
-        _cameraController = cameraController;
+        
     }
 
     protected override void Initialize()

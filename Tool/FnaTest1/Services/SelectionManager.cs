@@ -287,7 +287,6 @@ public class SelectionManager
 
             float worldXAt = Cursor.GetWorldX(_systemManagers, Layer);
             float worldYAt = Cursor.GetWorldY(_systemManagers, Layer);
-            System.Diagnostics.Debug.WriteLine($"{worldXAt}  {worldYAt}");
             IPositionedSizedObject representationOver = null;
 
             if (_editingManager.ContextMenuStrip?.Visible == true)

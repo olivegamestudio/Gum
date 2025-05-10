@@ -94,7 +94,7 @@ internal class MainEditorTabPlugin : PluginBase
     private readonly SelectionManager _selectionManager;
     private readonly ElementCommands _elementCommands;
     private readonly SinglePixelTextureService _singlePixelTextureService;
-    private readonly CameraController _cameraController;
+    private readonly HotkeyManager _hotkeyManager;
     private BackgroundSpriteService _backgroundSpriteService;
     private CanvasBoundsService _canvasBoundsService;
     private LayerService _layerService;
@@ -125,10 +125,7 @@ internal class MainEditorTabPlugin : PluginBase
         _screenshotService = new ScreenshotService(_selectionManager);
         _elementCommands = ElementCommands.Self;
         _singlePixelTextureService = new SinglePixelTextureService();
-        var hotkeyManager = Gum.Services.Builder.Get<HotkeyManager>();
-        _cameraController = new CameraController(
-            hotkeyManager
-            );
+        _hotkeyManager = Gum.Services.Builder.Get<HotkeyManager>();
         _backgroundSpriteService = new BackgroundSpriteService();
         _canvasBoundsService = new CanvasBoundsService();
         _layerService = new LayerService();
@@ -162,7 +159,7 @@ internal class MainEditorTabPlugin : PluginBase
         grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
         grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = GridLength.Auto});
 
-        var game = new EditorGame(_cameraController);
+        var game = new EditorGame();
         // Initialized has to be assigned before creating the fna control or else it won't
         // get called
         game.Initialized += () =>
@@ -191,7 +188,6 @@ internal class MainEditorTabPlugin : PluginBase
         };
 
         var fnaControl = new EditorWindow(
-            _cameraController, 
             _backgroundSpriteService, 
             game,
             _canvasBoundsService,
@@ -202,8 +198,8 @@ internal class MainEditorTabPlugin : PluginBase
 
         grid.Children.Add(fnaControl);
 
-        _cameraViewModel = new CameraViewModel(game.SystemManagers.Renderer.Camera);
-        _cameraController.Initialize(_cameraViewModel);
+        _cameraViewModel = new CameraViewModel(game.SystemManagers.Renderer.Camera, _hotkeyManager);
+
         _scrollBarControlLogic.Initialize(grid, fnaControl, game.SystemManagers);
         fnaControl.KeyDownWinforms += HandleKeyDownWinforms;
 
@@ -223,16 +219,16 @@ internal class MainEditorTabPlugin : PluginBase
     private void HandleKeyDownWinforms(object arg1, System.Windows.Forms.KeyEventArgs args)
     {
         var msg = new System.Windows.Forms.Message();
-        bool handled = HotkeyManager.Self.ProcessCmdKeyWireframe(ref msg, args.KeyData);
+        bool handled = _hotkeyManager.ProcessCmdKeyWireframe(ref msg, args.KeyData);
 
         if(!handled)
         {
-            handled = _cameraController.HandleKeyPress(args);
+            handled = _cameraViewModel.HandleKeyPress(args);
         }
 
         if(!handled)
         {
-            HotkeyManager.Self.HandleKeyDownWireframe(args);
+            _hotkeyManager.HandleKeyDownWireframe(args);
         }
 
         args.Handled = handled;

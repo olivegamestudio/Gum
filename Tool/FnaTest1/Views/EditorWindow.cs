@@ -20,7 +20,6 @@ internal class EditorWindow : FnaControl
 {
     bool mouseHasEntered = false;
 
-    private readonly CameraController _cameraController;
     private readonly EditorGame _game;
     private readonly BackgroundSpriteService _backgroundSpriteService;
     private readonly CanvasBoundsService _canvasBoundsService;
@@ -31,7 +30,6 @@ internal class EditorWindow : FnaControl
     CameraViewModel ViewModel => DataContext as CameraViewModel;
 
     public EditorWindow(
-        CameraController cameraController, 
         BackgroundSpriteService backgroundSpriteService, 
         EditorGame game,
         CanvasBoundsService canvasBoundsService,
@@ -40,7 +38,6 @@ internal class EditorWindow : FnaControl
         WindowsCursorLogic windowsCursorLogic
         ) : base(game)
     {
-        _cameraController = cameraController;
         _game = game;
         _backgroundSpriteService = backgroundSpriteService;
         _canvasBoundsService = canvasBoundsService;
@@ -48,7 +45,6 @@ internal class EditorWindow : FnaControl
         _selectionManager = selectionManager;
         _windowsCursorLogic = windowsCursorLogic;
 
-        _cameraController.Camera = _game.SystemManagers.Renderer.Camera;
         _game.Updated += HandleEveryFrameUpdate;
         MouseDownFNA += HandleMouseDown;
         MouseMoveFNA += HandleMouseMove;

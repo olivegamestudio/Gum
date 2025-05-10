@@ -1,4 +1,6 @@
-﻿using Gum.Mvvm;
+﻿using Gum.Managers;
+using Gum.Mvvm;
+using Gum.Plugins;
 using RenderingLibrary;
 using System;
 using System.Collections.Generic;
@@ -11,7 +13,7 @@ public class CameraViewModel : ViewModel
 {
     List<int> _availableZoomLevels = new List<int>();
     Camera _camera;
-
+    private readonly HotkeyManager _hotkeyManager;
     Microsoft.Xna.Framework.Point mLastMouseLocation;
 
     public List<int> AvailableZoomLevels =>
@@ -28,13 +30,17 @@ public class CameraViewModel : ViewModel
                 var zoomLevel = _availableZoomLevels[value];
 
                 _camera.Zoom = zoomLevel / 100f;
+
+                PluginManager.Self.CameraChanged();
             }
         }
     }
 
-    public CameraViewModel(Camera camera)
+    public CameraViewModel(Camera camera, HotkeyManager hotkeyManager)
     {
         _camera = camera;
+        _hotkeyManager = hotkeyManager;
+
         _availableZoomLevels.Add(1600);
         _availableZoomLevels.Add(1200);
         _availableZoomLevels.Add(1000);
@@ -59,8 +65,11 @@ public class CameraViewModel : ViewModel
         _availableZoomLevels.Add(25);
         _availableZoomLevels.Add(10);
         _availableZoomLevels.Add(5);
-        SelectedZoomIndex = _availableZoomLevels.IndexOf(100);
 
+        //SelectedZoomIndex = _availableZoomLevels.IndexOf(100);
+        // Don't set the property because doing so raises plugin events
+        // but the plugin system isn't yet running:
+        Set(_availableZoomLevels.IndexOf(100), nameof(SelectedZoomIndex));
     }
 
 
@@ -72,6 +81,7 @@ public class CameraViewModel : ViewModel
         {
             SelectedZoomIndex++;
         }
+
     }
 
     public void ZoomIn()
@@ -90,6 +100,47 @@ public class CameraViewModel : ViewModel
 
     }
 
+    public bool HandleKeyPress(System.Windows.Forms.KeyEventArgs e)
+    {
+        if (_hotkeyManager.MoveCameraLeft.IsPressed(e))
+        {
+            SystemManagers.Default.Renderer.Camera.X -= 10 / SystemManagers.Default.Renderer.Camera.Zoom;
+            PluginManager.Self.CameraChanged();
+
+            return true;
+        }
+        if (_hotkeyManager.MoveCameraRight.IsPressed(e))
+        {
+            SystemManagers.Default.Renderer.Camera.X += 10 / SystemManagers.Default.Renderer.Camera.Zoom;
+            PluginManager.Self.CameraChanged();
+            return true;
+        }
+        if (_hotkeyManager.MoveCameraUp.IsPressed(e))
+        {
+            SystemManagers.Default.Renderer.Camera.Y -= 10 / SystemManagers.Default.Renderer.Camera.Zoom;
+            PluginManager.Self.CameraChanged();
+            return true;
+        }
+        if (_hotkeyManager.MoveCameraDown.IsPressed(e))
+        {
+            SystemManagers.Default.Renderer.Camera.Y += 10 / SystemManagers.Default.Renderer.Camera.Zoom;
+            PluginManager.Self.CameraChanged();
+            return true;
+        }
+
+        if (_hotkeyManager.ZoomCameraIn.IsPressed(e) || _hotkeyManager.ZoomCameraInAlternative.IsPressed(e))
+        {
+            ZoomIn();
+            return true;
+        }
+
+        if (_hotkeyManager.ZoomCameraOut.IsPressed(e) || _hotkeyManager.ZoomCameraOutAlternative.IsPressed(e))
+        {
+            ZoomOut();
+            return true;
+        }
+        return false;
+    }
 
     internal void HandleMouseWheel(int delta, Microsoft.Xna.Framework.Point position)
     {
@@ -136,10 +187,10 @@ public class CameraViewModel : ViewModel
             _camera.Position.X -= xChange / _camera.Zoom;
             _camera.Position.Y -= yChange / _camera.Zoom;
 
-            //if (xChange != 0 || yChange != 0)
-            //{
-            //    CameraChanged?.Invoke();
-            //}
+            if (xChange != 0 || yChange != 0)
+            {
+                PluginManager.Self.CameraChanged();
+            }
 
             mLastMouseLocation = newPosition;
         }
