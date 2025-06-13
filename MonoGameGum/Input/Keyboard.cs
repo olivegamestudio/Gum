@@ -104,8 +104,10 @@ public class Keyboard : IInputReceiverKeyboardMonoGame
             var succeeded = false;
             try
             {
+#if !IOS && !ANDROID
                 game.Window.TextInput += HandleWindowTextInput;
                 succeeded = true;
+#endif
             }
             catch
             {
