@@ -151,5 +151,5 @@ public class DefaultButtonRuntime : InteractiveGue
 
     }
 
-    public Button FormsControl => FormsControlAsObject as Button;
+    public MonoGameGum.Forms.Controls.Button FormsControl => FormsControlAsObject as MonoGameGum.Forms.Controls.Button;
 }

@@ -159,6 +159,6 @@ namespace MonoGameGum.Forms.DefaultVisuals
             }
         }
 
-        public CheckBox FormsControl => FormsControlAsObject as CheckBox;
+        public MonoGameGum.Forms.Controls.CheckBox FormsControl => FormsControlAsObject as MonoGameGum.Forms.Controls.CheckBox;
     }
 }

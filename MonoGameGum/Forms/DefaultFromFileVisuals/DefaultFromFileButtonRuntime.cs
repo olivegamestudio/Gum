@@ -22,5 +22,5 @@ public class DefaultFromFileButtonRuntime : InteractiveGue
         }
     }
 
-    public Button FormsControl => (Button)FormsControlAsObject;
+    public MonoGameGum.Forms.Controls.Button FormsControl => (MonoGameGum.Forms.Controls.Button)FormsControlAsObject;
 }

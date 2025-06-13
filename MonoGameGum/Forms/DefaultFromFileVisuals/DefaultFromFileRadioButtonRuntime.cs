@@ -22,5 +22,5 @@ public class DefaultFromFileRadioButtonRuntime : InteractiveGue
         }
     }
 
-    public RadioButton FormsControl => FormsControlAsObject as RadioButton;
+    public MonoGameGum.Forms.Controls.RadioButton FormsControl => FormsControlAsObject as MonoGameGum.Forms.Controls.RadioButton;
 }
